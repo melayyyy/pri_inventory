@@ -6,6 +6,12 @@ if ($Ouser->is_login() == false) {
 }
 $actual_link = isset($_GET['page']) && is_string($_GET['page']) ? $_GET['page'] : 'dashboard';
 $actual_link = preg_match('/^[a-zA-Z0-9_]+$/', $actual_link) ? $actual_link : 'dashboard';
+
+$sessionUserName = isset($_SESSION['user_name']) && is_string($_SESSION['user_name']) ? trim($_SESSION['user_name']) : 'User';
+$avatarInitial = strtoupper(substr($sessionUserName, 0, 1));
+if ($avatarInitial === '') {
+  $avatarInitial = 'U';
+}
 ?>
 
 <!DOCTYPE html>
@@ -76,11 +82,11 @@ $actual_link = preg_match('/^[a-zA-Z0-9_]+$/', $actual_link) ? $actual_link : 'd
       <li class="nav-item dropdown">
         <a class="nav-link d-flex align-items-center" data-toggle="dropdown" href="#">
           <div class="user-panel d-flex mr-2">
-             <div class="image p-0">
-               <img src="dist/img/avatar5.png" class="img-circle elevation-1" alt="User Image" style="width: 30px; height: 30px;">
+             <div class="avatar-initial avatar-initial-sm">
+               <?php echo htmlspecialchars($avatarInitial, ENT_QUOTES, 'UTF-8'); ?>
              </div>
           </div>
-          <span class="text-dark font-weight-bold"><?php echo isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'User'; ?></span>
+          <span class="text-dark font-weight-bold"><?php echo htmlspecialchars($sessionUserName, ENT_QUOTES, 'UTF-8'); ?></span>
         </a>
         <div class="dropdown-menu dropdown-menu-right shadow border-0">
           <a href="index.php?page=profile" class="dropdown-item">

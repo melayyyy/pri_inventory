@@ -1,47 +1,47 @@
 
+<?php
+$sessionUserName = isset($_SESSION['user_name']) && is_string($_SESSION['user_name']) ? trim($_SESSION['user_name']) : 'User';
+$avatarInitial = strtoupper(substr($sessionUserName, 0, 1));
+if ($avatarInitial === '') {
+    $avatarInitial = 'U';
+}
+?>
+
 <!-- Main Sidebar Container -->
-<aside class="main-sidebar sidebar-dark-primary elevation-4">
+<aside class="main-sidebar sidebar-dark-primary elevation-4 sidebar-redesign" aria-label="Primary Navigation">
 
     <!-- Brand Logo -->
-    <a href="index.php?page=dashboard" class="brand-link">
-        <img src="dist/img/AdminLTELogo.png" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-        <span class="brand-text font-weight-light">Office Stock</span>
+    <a href="index.php?page=dashboard" class="brand-link" aria-label="Office Stock Dashboard">
+        <img src="dist/img/AdminLTELogo.png" alt="Logo" class="brand-image img-circle elevation-3">
+        <span class="brand-text font-weight-semibold">Office Stock</span>
     </a>
 
     <!-- Sidebar -->
-    <div class="sidebar">
-        <!-- Sidebar user panel (optional) -->
-        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-            <div class="image">
-                <img src="dist/img/avatar5.png" class="img-circle elevation-2" alt="User Image">
-            </div>
-            <div class="info">
-                <a href="#" class="d-block">
-                    <?php echo isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'User'; ?>
-                </a>
-            </div>
-        </div>
+    <div class="sidebar d-flex flex-column">
+        <a href="#mainContent" class="sr-only sr-only-focusable">Skip navigation</a>
 
         <!-- Sidebar Menu -->
-        <nav class="mt-2">
-            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+        <nav class="mt-2 flex-grow-1" aria-label="Sidebar Menu">
+            <ul class="nav nav-pills nav-sidebar flex-column sidebar-menu-list" data-widget="treeview" role="menu" data-accordion="false">
+                <li class="nav-header sidebar-section-label" role="presentation">CORE</li>
                 
                 <li class="nav-item">
-                    <a href="index.php?page=dashboard" class="nav-link <?php echo ($actual_link == 'dashboard' || $actual_link == '') ? 'active' : ''; ?>">
+                    <a href="index.php?page=dashboard" title="Dashboard" class="nav-link <?php echo ($actual_link == 'dashboard' || $actual_link == '') ? 'active' : ''; ?>" <?php echo ($actual_link == 'dashboard' || $actual_link == '') ? 'aria-current="page"' : ''; ?>>
                         <i class="nav-icon fas fa-tachometer-alt"></i>
                         <p>Dashboard</p>
                     </a>
                 </li>
                 
                 <li class="nav-item">
-                    <a href="index.php?page=category" class="nav-link <?php echo $actual_link == 'category' ? 'active' : ''; ?>">
+                    <a href="index.php?page=category" title="Categories" class="nav-link <?php echo $actual_link == 'category' ? 'active' : ''; ?>" <?php echo $actual_link == 'category' ? 'aria-current="page"' : ''; ?>>
                         <i class="nav-icon fas fa-th"></i>
                         <p>Categories</p>
                     </a>
                 </li>
 
+                <li class="nav-header sidebar-section-label" role="presentation">OPERATIONS</li>
                 <li class="nav-item has-treeview <?php echo in_array($actual_link, ['quick_sell', 'sell_list', 'sell_return_list']) ? 'menu-open' : ''; ?>">
-                    <a href="#" class="nav-link <?php echo in_array($actual_link, ['quick_sell', 'sell_list', 'sell_return_list']) ? 'active' : ''; ?>">
+                    <a href="#" title="Sales" class="nav-link <?php echo in_array($actual_link, ['quick_sell', 'sell_list', 'sell_return_list']) ? 'active' : ''; ?>">
                         <i class="nav-icon fas fa-shopping-cart"></i>
                         <p>
                             Sales
@@ -71,7 +71,7 @@
                 </li>
 
                 <li class="nav-item has-treeview <?php echo in_array($actual_link, ['add_expense', 'exspense_list', 'expense_catagory_list']) ? 'menu-open' : ''; ?>">
-                    <a href="#" class="nav-link <?php echo in_array($actual_link, ['add_expense', 'exspense_list', 'expense_catagory_list']) ? 'active' : ''; ?>">
+                    <a href="#" title="Expenses" class="nav-link <?php echo in_array($actual_link, ['add_expense', 'exspense_list', 'expense_catagory_list']) ? 'active' : ''; ?>">
                         <i class="nav-icon fas fa-money-bill-wave"></i>
                         <p>
                             Expenses
@@ -101,7 +101,7 @@
                 </li>
 
                 <li class="nav-item has-treeview <?php echo in_array($actual_link, ['buy_product', 'buy_list', 'buy_refund_list']) ? 'menu-open' : ''; ?>">
-                    <a href="#" class="nav-link <?php echo in_array($actual_link, ['buy_product', 'buy_list', 'buy_refund_list']) ? 'active' : ''; ?>">
+                    <a href="#" title="Purchases" class="nav-link <?php echo in_array($actual_link, ['buy_product', 'buy_list', 'buy_refund_list']) ? 'active' : ''; ?>">
                         <i class="nav-icon fas fa-truck"></i>
                         <p>
                             Purchases
@@ -131,7 +131,7 @@
                 </li>
 
                 <li class="nav-item has-treeview <?php echo in_array($actual_link, ['add_stuff', 'staff_list']) ? 'menu-open' : ''; ?>">
-                    <a href="#" class="nav-link <?php echo in_array($actual_link, ['add_stuff', 'staff_list']) ? 'active' : ''; ?>">
+                    <a href="#" title="Staff" class="nav-link <?php echo in_array($actual_link, ['add_stuff', 'staff_list']) ? 'active' : ''; ?>">
                         <i class="nav-icon fas fa-users"></i>
                         <p>
                             Staff
@@ -154,8 +154,9 @@
                     </ul>
                 </li>
 
+                <li class="nav-header sidebar-section-label" role="presentation">COMMUNICATION</li>
                 <li class="nav-item has-treeview <?php echo in_array($actual_link, ['member', 'suppliar', 'customers_report', 'suppliar_report', 'sms']) ? 'menu-open' : ''; ?>">
-                    <a href="#" class="nav-link <?php echo in_array($actual_link, ['member', 'suppliar', 'customers_report', 'suppliar_report', 'sms']) ? 'active' : ''; ?>">
+                    <a href="#" title="Contacts" class="nav-link <?php echo in_array($actual_link, ['member', 'suppliar', 'customers_report', 'suppliar_report', 'sms']) ? 'active' : ''; ?>">
                         <i class="nav-icon fas fa-address-book"></i>
                         <p>
                             Contacts
@@ -196,8 +197,9 @@
                     </ul>
                 </li>
 
+                <li class="nav-header sidebar-section-label" role="presentation">INSIGHTS</li>
                 <li class="nav-item has-treeview <?php echo in_array($actual_link, ['profit_loss', 'sales_report', 'purchase_report', 'purchase_pay_report', 'sell_pay_report', 'total_report']) ? 'menu-open' : ''; ?>">
-                    <a href="#" class="nav-link <?php echo in_array($actual_link, ['profit_loss', 'sales_report', 'purchase_report', 'purchase_pay_report', 'sell_pay_report', 'total_report']) ? 'active' : ''; ?>">
+                    <a href="#" title="Reports" class="nav-link <?php echo in_array($actual_link, ['profit_loss', 'sales_report', 'purchase_report', 'purchase_pay_report', 'sell_pay_report', 'total_report']) ? 'active' : ''; ?>">
                         <i class="nav-icon fas fa-chart-line"></i>
                         <p>
                             Reports
@@ -244,15 +246,26 @@
                     </ul>
                 </li>
                 
+                <li class="nav-header sidebar-section-label" role="presentation">SYSTEM</li>
                 <li class="nav-item">
-                     <a href="index.php?page=backup_database" class="nav-link <?php echo $actual_link == 'backup_database' ? 'active' : ''; ?>">
+                     <a href="index.php?page=backup_database" title="Backup Database" class="nav-link <?php echo $actual_link == 'backup_database' ? 'active' : ''; ?>" <?php echo $actual_link == 'backup_database' ? 'aria-current="page"' : ''; ?>>
                         <i class="nav-icon fas fa-database"></i>
                         <p>Backup Database</p>
                     </a>
                 </li>
             </ul>
         </nav>
-        <!-- /.sidebar-menu -->
+
+        <div class="sidebar-user-footer">
+            <a href="index.php?page=profile" class="sidebar-user-link" title="Open Profile">
+                <div class="avatar-initial avatar-initial-md"><?php echo htmlspecialchars($avatarInitial, ENT_QUOTES, 'UTF-8'); ?></div>
+                <div class="sidebar-user-meta">
+                    <span class="sidebar-user-name"><?php echo htmlspecialchars($sessionUserName, ENT_QUOTES, 'UTF-8'); ?></span>
+                    <span class="sidebar-user-role"><?php echo isset($_SESSION['user_role']) ? htmlspecialchars(ucfirst((string) $_SESSION['user_role']), ENT_QUOTES, 'UTF-8') : 'User'; ?></span>
+                </div>
+                <i class="fas fa-chevron-right sidebar-user-arrow" aria-hidden="true"></i>
+            </a>
+        </div>
     </div>
     <!-- /.sidebar -->
 </aside>
