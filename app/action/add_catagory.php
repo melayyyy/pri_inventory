@@ -1,24 +1,33 @@
-<?php 
+<?php
 require '../init.php';
-	if (isset($_POST)) {
-		$cat_name = $obj->escape($_POST['cat_name']);
-		$cat_descrip = $obj->escape($_POST['cat_descrip']);
-		$user = $_SESSION['user_id'];
-		if (!empty($cat_name)) {
-			  $query = array(
-			 	'name' => $cat_name , 
-			 	'description' => $cat_descrip,
-			 	'created_by' => $user
-			 );
 
-		$res = $obj->create('catagory' , $query);
-		if ($res) {
-			echo "yes";
-		}else{
-			echo "Failed to add catagory";
-		}
-	}else{
-		echo "Name field required";
-		}
-	}
- ?>
+if (!isset($_POST)) {
+    echo 'Invalid request';
+    exit;
+}
+
+$cat_name = isset($_POST['cat_name']) ? trim($_POST['cat_name']) : '';
+
+if ($cat_name === '') {
+    echo 'Name field required';
+    exit;
+}
+
+try {
+    $checkStmt = $pdo->prepare('SELECT id FROM categories WHERE LOWER(name) = LOWER(?) LIMIT 1');
+    $checkStmt->execute([$cat_name]);
+    $exists = $checkStmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($exists) {
+        echo 'Category already exists';
+        exit;
+    }
+
+    $insertStmt = $pdo->prepare('INSERT INTO categories (name) VALUES (?)');
+    $result = $insertStmt->execute([$cat_name]);
+
+    echo $result ? 'yes' : 'Failed to add category';
+} catch (Exception $e) {
+    echo 'Failed to add category';
+}
+

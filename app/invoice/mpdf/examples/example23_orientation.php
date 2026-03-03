@@ -68,7 +68,7 @@ $shortheaderE = '<div align="center" style="color:green;font-family:mono;font-si
 
 $mpdf->SetHTMLHeader($header);
 $mpdf->SetHTMLHeader($headerE,'E');
-$mpdf->setFooter('{PAGENO} of {nbpg} pages||{PAGENO} of {nbpg} pages') ;
+$mpdf->setFooter('[PAGENO] of {nbpg} pages||{PAGENO} of {nbpg} pages') ;
 
 
 $mpdf->WriteHTML($html);
@@ -89,7 +89,7 @@ $mpdf->WriteHTML($html);
 
 
 
-$mpdf->setHeader('{PAGENO} of {nbpg} pages||{PAGENO} of {nbpg} pages') ;
+$mpdf->setHeader('[PAGENO] of {nbpg} pages||{PAGENO} of {nbpg} pages') ;
 $mpdf->SetHTMLFooter($footer);
 $mpdf->SetHTMLFooter($footerE,'E');
 

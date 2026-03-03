@@ -55,7 +55,7 @@ $mpdf=new mPDF();
 $mpdf->SetImportUse();	
 $mpdf->SetDisplayMode('fullpage');
 
-$mpdf->SetHeader('{DATE j-m-Y}|My Yearbook 2005|{PAGENO}');
+$mpdf->SetHeader('[DATE j-m-Y]|My Yearbook 2005|{PAGENO}');
 $mpdf->SetFooter('|Printed using mPDF|');
 
 $pagecount = $mpdf->SetSourceFile('test.pdf');

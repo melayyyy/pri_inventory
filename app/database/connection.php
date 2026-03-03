@@ -3,6 +3,7 @@
 class TursoConnection {
     private $dbUrl;
     private $authToken;
+    private $lastInsertId = 0;
 
     public function __construct() {
         $this->dbUrl = TURSO_DB_URL;
@@ -22,7 +23,7 @@ class TursoConnection {
     }
 
     public function prepare($sql) {
-        return new TursoStatement($sql, $this->dbUrl, $this->authToken);
+        return new TursoStatement($sql, $this->dbUrl, $this->authToken, $this);
     }
 
     public function query($sql, $params = []) {
@@ -37,7 +38,11 @@ class TursoConnection {
     }
 
     public function lastInsertId() {
-        return 0;
+        return $this->lastInsertId;
+    }
+
+    public function setLastInsertId($id) {
+        $this->lastInsertId = $id;
     }
 }
 
@@ -52,11 +57,13 @@ class TursoStatement {
     private $currentRow = 0;
     private $executed = false;
     private $rawResponse = null;
+    private $connection;
 
-    public function __construct($sql, $dbUrl = null, $authToken = null) {
+    public function __construct($sql, $dbUrl = null, $authToken = null, $connection = null) {
         $this->sql = $sql;
         $this->dbUrl = $dbUrl;
         $this->authToken = $authToken;
+        $this->connection = $connection;
     }
 
     private function getHttpUrl() {
@@ -201,6 +208,11 @@ class TursoStatement {
                     $this->columns[] = $col['name'];
                 }
             }
+
+            // Capture last_insert_rowid if available and we have a connection reference
+            if (isset($resp['result']['last_insert_rowid']) && $this->connection) {
+                $this->connection->setLastInsertId($resp['result']['last_insert_rowid']);
+            }
         }
         
         $this->executed = true;
@@ -296,3 +308,4 @@ try {
     exit;
 }
 ?>
+

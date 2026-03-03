@@ -2,11 +2,11 @@
 require_once 'app/init.php';
 if ($Ouser->is_login() == false) {
   header("location:login.php");
+  exit;
 }
-$actual_link = explode('=', "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]");
-  $actual_link = end($actual_link);
-
- ?>
+$actual_link = isset($_GET['page']) && is_string($_GET['page']) ? $_GET['page'] : 'dashboard';
+$actual_link = preg_match('/^[a-zA-Z0-9_]+$/', $actual_link) ? $actual_link : 'dashboard';
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -15,7 +15,7 @@ $actual_link = explode('=', "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]");
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
 
-  <title>AFS</title>
+  <title>Office Stock Manager</title>
 
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
@@ -23,40 +23,31 @@ $actual_link = explode('=', "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]");
   <link rel="stylesheet" href="plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
   
   <!-- DataTables -->
-  <link href='//cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css' rel='stylesheet' type='text/css'>
-  <!-- datepi cker css  -->
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
-  <!-- select 2 css  -->
+  <link href='https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css' rel='stylesheet' type='text/css'>
+  <!-- datepicker css -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+  <!-- select2 css -->
   <link rel="stylesheet" type="text/css" href="plugins/select2/css/select2.min.css"/>
-  <!-- custom css  -->
-  <link rel="stylesheet" href="assets/css/style.css">
-  <!-- Google Font: Source Sans Pro -->
-<!-- date picker -->
-<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-
-
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+  <!-- Material Icons -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  
   <!-- Theme style -->
   <link rel="stylesheet" href="dist/css/adminlte.min.css">
-  
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="assets/css/style.css">
 
-<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
-
-  <style>
-    .select2-container .select2-selection--single {
-    height: 37px;
-}
-  </style>
 </head>
-<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
+<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed text-sm">
 
 <div class="wrapper">
   <!-- Page Preloder -->
-    <div id="page"></div>
-    <style>#loading { display: none !important; }</style>
+  <div id="page"></div>
+  <style>#loading { display: none !important; }</style>
     
   <!-- Navbar -->
-  <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+  <nav class="main-header navbar navbar-expand navbar-white navbar-light shadow-sm">
     <!-- Left navbar links -->
     <ul class="navbar-nav">
       <li class="nav-item">
@@ -64,38 +55,40 @@ $actual_link = explode('=', "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]");
       </li>
     </ul>
 
- <!-- Right navbar links -->
-    <ul class="navbar-nav ml-auto">
+    <!-- Right navbar links -->
+    <ul class="navbar-nav ml-auto align-items-center">
       
-      <div id="google_translate_element"></div>
-      <div class="notice">
-                 <li>
-                     <i class="material-symbols-outlined">
-                         <a href="https://www.youtube.com/@MayuriK/videos" target="_blank"> notifications</a></i>
-                    </li>
-                    <li> <i class="material-symbols-outlined"><a href="mailto: mayuri.infospace@gmail.com" target="_blank"> mail</a></i></li>
-                    <li>
-                      <i class="material-symbols-outlined"><a href="https://www.mayurik.com/#download_section" target="_blank"> redeem</a> </i>   
-                    </li>
-      </div>
-                    
+      <!-- Notifications (Placeholder) -->
       <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">
-          <img src="https://img.freepik.com/premium-vector/woman-avatar-profile-round-icon_24640-14042.jpg">
-            <span><b>Anna Katrina</b> <strong> Flores</strong></span>
+        <a class="nav-link" data-toggle="dropdown" href="#">
+          <i class="far fa-bell"></i>
         </a>
-        <div class="dropdown-menu dropdown-menu-right p-0">
-          <a href="index.php?page=profile" class="dropdown-item p-1">
-            <i class="material-symbols-outlined">person</i> Profile
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+          <span class="dropdown-item dropdown-header">Notifications</span>
+          <div class="dropdown-divider"></div>
+          <a href="#" class="dropdown-item">
+            <i class="fas fa-envelope mr-2"></i> No new messages
           </a>
+        </div>
+      </li>
 
-          <a href="index.php?page=profile" class="dropdown-item p-1">
-            <i class="material-symbols-outlined">
-            stacked_inbox</i>Inbox
+      <!-- User Menu -->
+      <li class="nav-item dropdown">
+        <a class="nav-link d-flex align-items-center" data-toggle="dropdown" href="#">
+          <div class="user-panel d-flex mr-2">
+             <div class="image p-0">
+               <img src="dist/img/avatar5.png" class="img-circle elevation-1" alt="User Image" style="width: 30px; height: 30px;">
+             </div>
+          </div>
+          <span class="text-dark font-weight-bold"><?php echo isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'User'; ?></span>
+        </a>
+        <div class="dropdown-menu dropdown-menu-right shadow border-0">
+          <a href="index.php?page=profile" class="dropdown-item">
+            <i class="fas fa-user mr-2 text-muted"></i> Profile
           </a>
-
-          <a href="app/action/logout.php" class="dropdown-item pic p-1">
-            <i class="material-symbols-outlined" >logout</i> Logout
+          <div class="dropdown-divider"></div>
+          <a href="app/action/logout.php" class="dropdown-item text-danger">
+            <i class="fas fa-sign-out-alt mr-2"></i> Logout
           </a>
         </div>
       </li>
