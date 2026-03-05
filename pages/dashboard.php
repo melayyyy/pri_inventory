@@ -307,9 +307,23 @@ $isAnalyticsEmpty = array_sum(array_map('abs', array_values($chart['sales']))) =
     }
 
     .dashboard-shell {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
         padding: 24px;
         background: var(--dash-bg);
         border-radius: 16px;
+        overflow-x: clip;
+    }
+
+    .dashboard-shell .row {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .dashboard-shell .row > [class*="col-"] {
+        padding-left: 6px;
+        padding-right: 6px;
     }
 
     .hero-band {
@@ -321,6 +335,11 @@ $isAnalyticsEmpty = array_sum(array_map('abs', array_values($chart['sales']))) =
         margin-bottom: 18px;
     }
 
+    .hero-band,
+    .hero-band * {
+        color: #ffffff !important;
+    }
+
     .hero-title {
         margin: 0;
         font-size: 1.45rem;
@@ -330,7 +349,7 @@ $isAnalyticsEmpty = array_sum(array_map('abs', array_values($chart['sales']))) =
 
     .hero-subtitle {
         margin: 6px 0 0;
-        color: rgba(248, 250, 252, 0.85);
+        color: #ffffff;
         font-size: 0.92rem;
     }
 
@@ -626,6 +645,25 @@ $isAnalyticsEmpty = array_sum(array_map('abs', array_values($chart['sales']))) =
     }
 </style>
 
+<div class="content-wrapper" id="mainContent">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0 text-dark">Dashboard</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="index.php?page=dashboard">Home</a></li>
+                        <li class="breadcrumb-item active">Dashboard</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="content">
+        <div class="container-fluid">
 <div class="dashboard-shell">
     <section class="hero-band" aria-labelledby="analyticsHeading">
         <h1 id="analyticsHeading" class="hero-title">Business Analytics Dashboard</h1>
@@ -921,6 +959,9 @@ $isAnalyticsEmpty = array_sum(array_map('abs', array_values($chart['sales']))) =
             </section>
         </div>
     </div>
+</div>
+        </div>
+    </section>
 </div>
 
 <script>
