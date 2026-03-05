@@ -1,375 +1,504 @@
 <?php
-if (!$obj->is_login()) {
+if (!$Ouser->is_login()) {
     redirect("login.php");
 }
 
 $analyticsError = null;
-$stats = [
-    'sales_month' => 0,
-    'purchase_month' => 0,
-    'due_sales' => 0,
-    'due_purchase' => 0,
+
+$kpi = [
+    'sales_month' => 0.0,
+    'purchase_month' => 0.0,
+    'expense_month' => 0.0,
+    'profit_month' => 0.0,
+    'sales_due_total' => 0.0,
+    'purchase_due_total' => 0.0,
+    'collection_rate_month' => 0.0,
+    'inventory_health' => 100.0,
     'low_stock_count' => 0,
     'total_products' => 0,
-    'recent_sale_count' => 0,
 ];
 
-$recent_sales = [];
-$low_stock_items = [];
-$top_products = [];
-$chart_data = [
+$chart = [
     'months' => [],
     'sales' => [],
     'purchases' => [],
+    'expenses' => [],
     'stock_status' => [0, 0, 0],
+    'payment_labels' => [],
+    'payment_values' => [],
+    'top_product_labels' => [],
+    'top_product_values' => [],
+    'category_labels' => [],
+    'category_values' => [],
 ];
 
-$dashboardInsights = [
-    'net_cash_flow' => 0,
-    'collection_rate' => 0,
-    'inventory_health' => 100,
-    'empty_state' => true,
+$recentSales = [];
+$lowStockItems = [];
+
+$officeSuppliesSummary = [
+    'total_items' => 0,
+    'total_stock_units' => 0,
+    'estimated_stock_value' => 0.0,
 ];
 
-$start_month = date('Y-m-01');
-$end_month = date('Y-m-t');
-
-try {
-    $sql = "SELECT SUM(net_total) as total FROM invoice WHERE order_date >= :start_date AND order_date <= :end_date";
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindValue(':start_date', $start_month);
-    $stmt->bindValue(':end_date', $end_month);
-    $stmt->execute();
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-    $stats['sales_month'] = (float) ($row['total'] ?? 0);
-
-    $sql = "SELECT SUM(purchase_net_total) as total FROM purchase_products WHERE purchase_date >= :start_date AND purchase_date <= :end_date";
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindValue(':start_date', $start_month);
-    $stmt->bindValue(':end_date', $end_month);
-    $stmt->execute();
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-    $stats['purchase_month'] = (float) ($row['total'] ?? 0);
-
-    $sql = "SELECT SUM(due_amount) as total FROM invoice";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute();
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-    $stats['due_sales'] = (float) ($row['total'] ?? 0);
-
-    $sql = "SELECT SUM(purchase_due_bill) as total FROM purchase_products";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute();
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-    $stats['due_purchase'] = (float) ($row['total'] ?? 0);
-
-    $sql = "SELECT COUNT(*) as total FROM products WHERE quantity <= alert_quanttity";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute();
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-    $stats['low_stock_count'] = (int) ($row['total'] ?? 0);
-
-    $sql = "SELECT COUNT(*) as total FROM products";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute();
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-    $stats['total_products'] = (int) ($row['total'] ?? 0);
-
-    $sql = "SELECT * FROM invoice ORDER BY order_date DESC LIMIT 8";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute();
-    $recent_sales = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    $stats['recent_sale_count'] = count($recent_sales);
-
-    $sql = "SELECT * FROM products WHERE quantity <= alert_quanttity ORDER BY quantity ASC LIMIT 8";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute();
-    $low_stock_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    $sql = "SELECT product_name, SUM(quantity) as qty FROM invoice_details GROUP BY product_name ORDER BY qty DESC LIMIT 8";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute();
-    $top_products = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    for ($i = 5; $i >= 0; $i--) {
-        $monthKey = date('Y-m', strtotime("-$i months"));
-        $chart_data['months'][] = date('M Y', strtotime("-$i months"));
-        $chart_data['sales'][$monthKey] = 0;
-        $chart_data['purchases'][$monthKey] = 0;
-    }
-
-    $sql = "SELECT strftime('%Y-%m', order_date) as month, SUM(net_total) as total FROM invoice WHERE order_date >= date('now', '-6 months') GROUP BY month";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute();
-    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    foreach ($rows as $r) {
-        if (isset($chart_data['sales'][$r['month']])) {
-            $chart_data['sales'][$r['month']] = (float) $r['total'];
-        }
-    }
-
-    $sql = "SELECT strftime('%Y-%m', purchase_date) as month, SUM(purchase_net_total) as total FROM purchase_products WHERE purchase_date >= date('now', '-6 months') GROUP BY month";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute();
-    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    foreach ($rows as $r) {
-        if (isset($chart_data['purchases'][$r['month']])) {
-            $chart_data['purchases'][$r['month']] = (float) $r['total'];
-        }
-    }
-
-    $sql = "SELECT 
-            SUM(CASE WHEN quantity > alert_quanttity THEN 1 ELSE 0 END) as healthy,
-            SUM(CASE WHEN quantity <= alert_quanttity AND quantity > 0 THEN 1 ELSE 0 END) as low,
-            SUM(CASE WHEN quantity = 0 THEN 1 ELSE 0 END) as out_of_stock
-            FROM products";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute();
-    $stock_row = $stmt->fetch(PDO::FETCH_ASSOC);
-    $chart_data['stock_status'] = [
-        (int) ($stock_row['healthy'] ?? 0),
-        (int) ($stock_row['low'] ?? 0),
-        (int) ($stock_row['out_of_stock'] ?? 0),
-    ];
-} catch (Exception $e) {
-    $analyticsError = "Error loading dashboard data: " . $e->getMessage();
+$monthKeys = [];
+for ($i = 5; $i >= 0; $i--) {
+    $date = new DateTime("first day of -{$i} month");
+    $monthKey = $date->format('Y-m');
+    $monthKeys[] = $monthKey;
+    $chart['months'][] = $date->format('M Y');
+    $chart['sales'][$monthKey] = 0.0;
+    $chart['purchases'][$monthKey] = 0.0;
+    $chart['expenses'][$monthKey] = 0.0;
 }
 
-$dashboardInsights['net_cash_flow'] = $stats['sales_month'] - $stats['purchase_month'];
-$dashboardInsights['collection_rate'] = $stats['sales_month'] > 0
-    ? (($stats['sales_month'] - $stats['due_sales']) / $stats['sales_month']) * 100
-    : 0;
-$dashboardInsights['inventory_health'] = $stats['total_products'] > 0
-    ? (($stats['total_products'] - $stats['low_stock_count']) / $stats['total_products']) * 100
-    : 100;
-$dashboardInsights['empty_state'] = empty($recent_sales) && empty($top_products) && $stats['total_products'] === 0;
+$focusMonthLabel = date('M Y');
+
+try {
+    $queryScalar = function ($sql, $params = [], $field = 'total') use ($pdo) {
+        $stmt = $pdo->prepare($sql);
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return (float) ($row[$field] ?? 0);
+    };
+
+    $fillMonthlySeries = function ($sql, &$targetArray, $params = []) use ($pdo) {
+        $stmt = $pdo->prepare($sql);
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
+        $stmt->execute();
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($rows as $row) {
+            $month = (string) ($row['month_key'] ?? '');
+            if ($month !== '' && array_key_exists($month, $targetArray)) {
+                $targetArray[$month] = (float) ($row['total'] ?? 0);
+            }
+        }
+    };
+
+    // Use latest activity month so analytics remain visible for historical datasets.
+    $anchorDate = new DateTime('now');
+    $stmt = $pdo->prepare(
+        "SELECT MAX(dt) AS latest_date FROM (
+            SELECT MAX(order_date) AS dt FROM invoice
+            UNION ALL
+            SELECT MAX(purchase_date) AS dt FROM purchase_products
+            UNION ALL
+            SELECT MAX(ex_date) AS dt FROM expense
+        ) src"
+    );
+    $stmt->execute();
+    $latestDateRow = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+    $latestDate = (string) ($latestDateRow['latest_date'] ?? '');
+    if ($latestDate !== '' && $latestDate !== '0000-00-00') {
+        $parsedLatest = DateTime::createFromFormat('Y-m-d', $latestDate);
+        if ($parsedLatest instanceof DateTime) {
+            $anchorDate = $parsedLatest;
+        }
+    }
+
+    $monthKeys = [];
+    $chart['months'] = [];
+    $chart['sales'] = [];
+    $chart['purchases'] = [];
+    $chart['expenses'] = [];
+    for ($i = 5; $i >= 0; $i--) {
+        $monthDate = (clone $anchorDate)->modify("first day of -{$i} month");
+        $monthKey = $monthDate->format('Y-m');
+        $monthKeys[] = $monthKey;
+        $chart['months'][] = $monthDate->format('M Y');
+        $chart['sales'][$monthKey] = 0.0;
+        $chart['purchases'][$monthKey] = 0.0;
+        $chart['expenses'][$monthKey] = 0.0;
+    }
+
+    $rangeStart = (clone $anchorDate)->modify('first day of -5 month')->format('Y-m-01');
+    $rangeEnd = (clone $anchorDate)->modify('last day of this month')->format('Y-m-d');
+    $currentMonthStart = (clone $anchorDate)->modify('first day of this month')->format('Y-m-01');
+    $currentMonthEnd = (clone $anchorDate)->modify('last day of this month')->format('Y-m-d');
+    $currentMonthKey = (clone $anchorDate)->modify('first day of this month')->format('Y-m');
+    $focusMonthLabel = (clone $anchorDate)->format('M Y');
+
+    $fillMonthlySeries(
+        "SELECT strftime('%Y-%m', order_date) AS month_key, SUM(net_total) AS total
+         FROM invoice
+         WHERE order_date >= :range_start AND order_date <= :range_end
+         GROUP BY month_key",
+        $chart['sales'],
+        [':range_start' => $rangeStart, ':range_end' => $rangeEnd]
+    );
+
+    $fillMonthlySeries(
+        "SELECT strftime('%Y-%m', purchase_date) AS month_key, SUM(purchase_net_total) AS total
+         FROM purchase_products
+         WHERE purchase_date >= :range_start AND purchase_date <= :range_end
+         GROUP BY month_key",
+        $chart['purchases'],
+        [':range_start' => $rangeStart, ':range_end' => $rangeEnd]
+    );
+
+    $fillMonthlySeries(
+        "SELECT strftime('%Y-%m', ex_date) AS month_key, SUM(amount) AS total
+         FROM expense
+         WHERE ex_date >= :range_start AND ex_date <= :range_end
+         GROUP BY month_key",
+        $chart['expenses'],
+        [':range_start' => $rangeStart, ':range_end' => $rangeEnd]
+    );
+
+    $kpi['sales_month'] = (float) ($chart['sales'][$currentMonthKey] ?? 0);
+    $kpi['purchase_month'] = (float) ($chart['purchases'][$currentMonthKey] ?? 0);
+    $kpi['expense_month'] = (float) ($chart['expenses'][$currentMonthKey] ?? 0);
+    $kpi['profit_month'] = $kpi['sales_month'] - $kpi['purchase_month'] - $kpi['expense_month'];
+
+    $salesPaidMonth = $queryScalar(
+        "SELECT SUM(paid_amount) AS total
+         FROM invoice
+         WHERE order_date >= :start_date AND order_date <= :end_date",
+        [':start_date' => $currentMonthStart, ':end_date' => $currentMonthEnd]
+    );
+    $kpi['collection_rate_month'] = $kpi['sales_month'] > 0
+        ? min(100, max(0, ($salesPaidMonth / $kpi['sales_month']) * 100))
+        : 0;
+
+    $kpi['sales_due_total'] = $queryScalar("SELECT SUM(due_amount) AS total FROM invoice");
+    $kpi['purchase_due_total'] = $queryScalar("SELECT SUM(purchase_due_bill) AS total FROM purchase_products");
+
+    $kpi['low_stock_count'] = (int) $queryScalar("SELECT COUNT(*) AS total FROM products WHERE quantity <= alert_quanttity");
+    $kpi['total_products'] = (int) $queryScalar("SELECT COUNT(*) AS total FROM products");
+    $kpi['inventory_health'] = $kpi['total_products'] > 0
+        ? (($kpi['total_products'] - $kpi['low_stock_count']) / $kpi['total_products']) * 100
+        : 100;
+
+    $stmt = $pdo->prepare(
+        "SELECT
+            SUM(CASE WHEN quantity > alert_quanttity THEN 1 ELSE 0 END) AS healthy,
+            SUM(CASE WHEN quantity <= alert_quanttity AND quantity > 0 THEN 1 ELSE 0 END) AS low,
+            SUM(CASE WHEN quantity = 0 THEN 1 ELSE 0 END) AS out_of_stock
+         FROM products"
+    );
+    $stmt->execute();
+    $stockRow = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+    $chart['stock_status'] = [
+        (int) ($stockRow['healthy'] ?? 0),
+        (int) ($stockRow['low'] ?? 0),
+        (int) ($stockRow['out_of_stock'] ?? 0),
+    ];
+
+    $stmt = $pdo->prepare(
+        "SELECT invoice_number, customer_name, order_date, net_total, due_amount, payment_type
+         FROM invoice
+         ORDER BY order_date DESC, id DESC
+         LIMIT 8"
+    );
+    $stmt->execute();
+    $recentSales = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $stmt = $pdo->prepare(
+        "SELECT product_name, quantity, alert_quanttity
+         FROM products
+         WHERE quantity <= alert_quanttity
+         ORDER BY quantity ASC, id DESC
+         LIMIT 8"
+    );
+    $stmt->execute();
+    $lowStockItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $stmt = $pdo->prepare(
+        "SELECT product_name, SUM(quantity) AS qty
+         FROM invoice_details
+         GROUP BY product_name
+         ORDER BY qty DESC
+         LIMIT 7"
+    );
+    $stmt->execute();
+    $topProducts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($topProducts as $item) {
+        $chart['top_product_labels'][] = (string) ($item['product_name'] ?? 'Unknown');
+        $chart['top_product_values'][] = (int) ($item['qty'] ?? 0);
+    }
+
+    $stmt = $pdo->prepare(
+        "SELECT COALESCE(payment_type, 'Unknown') AS label, SUM(net_total) AS total
+         FROM invoice
+         WHERE order_date >= :start_date AND order_date <= :end_date
+         GROUP BY payment_type
+         ORDER BY total DESC
+         LIMIT 6"
+    );
+    $stmt->bindValue(':start_date', $currentMonthStart);
+    $stmt->bindValue(':end_date', $currentMonthEnd);
+    $stmt->execute();
+    $paymentRows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($paymentRows as $row) {
+        $chart['payment_labels'][] = (string) ($row['label'] ?? 'Unknown');
+        $chart['payment_values'][] = (float) ($row['total'] ?? 0);
+    }
+
+    $stmt = $pdo->prepare(
+        "SELECT COALESCE(p.catagory_name, 'Uncategorized') AS category_name, SUM(d.quantity) AS total
+         FROM invoice_details d
+         LEFT JOIN products p ON p.id = d.pid
+         GROUP BY p.catagory_name
+         ORDER BY total DESC
+         LIMIT 6"
+    );
+    $stmt->execute();
+    $categoryRows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($categoryRows as $row) {
+        $chart['category_labels'][] = (string) ($row['category_name'] ?? 'Uncategorized');
+        $chart['category_values'][] = (int) ($row['total'] ?? 0);
+    }
+
+    try {
+        $stmt = $pdo->prepare(
+            "SELECT
+                COUNT(*) AS total_items,
+                COALESCE(SUM(COALESCE(s.quantity_available, 0)), 0) AS total_stock_units,
+                COALESCE(SUM(COALESCE(s.quantity_available, 0) * COALESCE(os.unit_cost, 0)), 0) AS estimated_stock_value
+             FROM office_supplies os
+             LEFT JOIN stock s ON s.office_supply_id = os.id"
+        );
+        $stmt->execute();
+        $summaryRow = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+        $officeSuppliesSummary['total_items'] = (int) ($summaryRow['total_items'] ?? 0);
+        $officeSuppliesSummary['total_stock_units'] = (int) ($summaryRow['total_stock_units'] ?? 0);
+        $officeSuppliesSummary['estimated_stock_value'] = (float) ($summaryRow['estimated_stock_value'] ?? 0);
+    } catch (Exception $ignored) {
+        // Office supplies tables may not exist in every tenant DB.
+    }
+} catch (Exception $e) {
+    $analyticsError = 'Unable to load analytics right now. ' . $e->getMessage();
+}
+
+$netTrend = [];
+foreach ($monthKeys as $key) {
+    $netTrend[] = ((float) ($chart['sales'][$key] ?? 0))
+        - ((float) ($chart['purchases'][$key] ?? 0))
+        - ((float) ($chart['expenses'][$key] ?? 0));
+}
+
+$isAnalyticsEmpty = array_sum(array_map('abs', array_values($chart['sales']))) === 0
+    && array_sum(array_map('abs', array_values($chart['purchases']))) === 0
+    && array_sum(array_map('abs', array_values($chart['expenses']))) === 0
+    && $kpi['total_products'] === 0;
 ?>
 
 <style>
     :root {
-        --dash-primary: #1d4ed8;
-        --dash-primary-soft: #e8f0ff;
-        --dash-success: #15803d;
-        --dash-danger: #be123c;
-        --dash-warning: #c2410c;
+        --dash-bg: linear-gradient(155deg, #f8fbff 0%, #eef4ff 45%, #f7fbf7 100%);
         --dash-surface: #ffffff;
-        --dash-text: #0f172a;
+        --dash-text: #111827;
         --dash-muted: #64748b;
-        --dash-border: #e2e8f0;
-        --dash-radius: 8px;
+        --dash-border: #e5edf8;
+        --dash-primary: #2563eb;
+        --dash-primary-soft: #dbeafe;
+        --dash-success: #16a34a;
+        --dash-warning: #ea580c;
+        --dash-danger: #dc2626;
+        --dash-violet: #4338ca;
+        --dash-shadow: 0 16px 30px rgba(15, 23, 42, 0.06);
+        --dash-radius: 14px;
     }
 
     .dashboard-shell {
         padding: 24px;
+        background: var(--dash-bg);
+        border-radius: 16px;
     }
 
-    .dash-panel {
-        background: var(--dash-surface);
-        border: 1px solid var(--dash-border);
-        border-radius: var(--dash-radius);
-        box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
+    .hero-band {
+        background: linear-gradient(125deg, #0f172a 0%, #1e3a8a 52%, #0f766e 100%);
+        border-radius: 18px;
+        padding: 22px;
+        color: #f8fafc;
+        box-shadow: 0 18px 36px rgba(15, 23, 42, 0.18);
+        margin-bottom: 18px;
     }
 
-    .dash-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 16px;
-        margin-bottom: 24px;
-    }
-
-    .dash-title {
+    .hero-title {
         margin: 0;
-        font-size: 1.5rem;
+        font-size: 1.45rem;
         font-weight: 700;
-        color: var(--dash-text);
+        letter-spacing: 0.2px;
     }
 
-    .dash-subtitle {
-        margin: 4px 0 0;
-        color: var(--dash-muted);
+    .hero-subtitle {
+        margin: 6px 0 0;
+        color: rgba(248, 250, 252, 0.85);
         font-size: 0.92rem;
     }
 
-    .search-toolbar {
+    .hero-stats {
         display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 8px;
-        border: 1px solid var(--dash-border);
-        background: #fff;
-        border-radius: 8px;
-        min-width: 360px;
-        max-width: 520px;
-        width: 100%;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 14px;
     }
 
-    .search-toolbar:focus-within {
-        border-color: var(--dash-primary);
-        box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.14);
-    }
-
-    .search-icon {
-        color: #94a3b8;
-        margin-left: 4px;
-    }
-
-    .search-toolbar input {
-        flex: 1;
-        border: 0;
-        outline: 0;
-        height: 36px;
-        color: var(--dash-text);
-        font-size: 0.92rem;
-        background: transparent;
-    }
-
-    .search-toolbar button {
-        border: 1px solid var(--dash-border);
-        height: 34px;
-        border-radius: 6px;
-        padding: 0 12px;
-        background: #f8fafc;
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: #334155;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-
-    .search-toolbar button:hover,
-    .search-toolbar button:focus {
-        background: #eef2f7;
-        outline: none;
-    }
-
-    .kpi-card {
-        min-height: 108px;
-        padding: 16px;
-        display: flex;
-        gap: 12px;
-        align-items: flex-start;
-    }
-
-    .kpi-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 8px;
+    .hero-chip {
         display: inline-flex;
         align-items: center;
-        justify-content: center;
-        font-size: 18px;
+        gap: 6px;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        color: #f8fafc;
+        border-radius: 999px;
+        padding: 6px 12px;
+        font-size: 0.8rem;
+        font-weight: 600;
     }
 
-    .kpi-icon.primary { background: #e8f0ff; color: #1d4ed8; }
-    .kpi-icon.success { background: #e8f9ef; color: #15803d; }
-    .kpi-icon.warning { background: #fff3e8; color: #c2410c; }
-    .kpi-icon.danger { background: #ffe6ee; color: #be123c; }
-
-    .kpi-label {
-        color: var(--dash-muted);
-        font-size: 0.82rem;
-        margin-bottom: 4px;
-    }
-
-    .kpi-value {
-        font-size: 1.2rem;
-        font-weight: 700;
-        color: var(--dash-text);
-        line-height: 1.2;
-    }
-
-    .insight-grid {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 16px;
-    }
-
-    .insight-box {
+    .dashboard-shell .card {
         border: 1px solid var(--dash-border);
-        border-radius: 8px;
-        padding: 16px;
-        background: linear-gradient(180deg, #fff, #f8fbff);
+        border-radius: var(--dash-radius);
+        box-shadow: var(--dash-shadow);
+        overflow: hidden;
     }
 
-    .insight-box .label {
+    .metric-card {
+        background: var(--dash-surface);
+        min-height: 114px;
+    }
+
+    .metric-card .card-body {
+        padding: 16px;
+    }
+
+    .metric-label {
         color: var(--dash-muted);
         font-size: 0.8rem;
-        margin-bottom: 6px;
+        margin-bottom: 5px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        font-weight: 600;
     }
 
-    .insight-box .value {
-        font-size: 1.18rem;
-        font-weight: 700;
-        color: var(--dash-text);
-    }
-
-    .section-head {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 8px;
-        padding: 16px 16px 0;
-    }
-
-    .section-title {
+    .metric-value {
         margin: 0;
-        font-size: 1rem;
-        font-weight: 700;
         color: var(--dash-text);
+        font-size: 1.2rem;
+        font-weight: 700;
+        line-height: 1.25;
     }
 
-    .section-actions .btn {
-        font-size: 0.82rem;
+    .metric-note {
+        margin-top: 8px;
+        font-size: 0.78rem;
+        color: #475569;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
     }
 
-    .table-wrap {
-        padding: 12px 16px 16px;
-        overflow-x: auto;
+    .badge-analytics {
+        border-radius: 999px;
+        padding: 4px 10px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        border: 1px solid transparent;
     }
 
-    .dash-table {
+    .badge-primary-soft {
+        background: #e0eaff;
+        color: #1e40af;
+        border-color: #c6d9ff;
+    }
+
+    .badge-success-soft {
+        background: #dcfce7;
+        color: #166534;
+        border-color: #bbf7d0;
+    }
+
+    .badge-warning-soft {
+        background: #ffedd5;
+        color: #9a3412;
+        border-color: #fed7aa;
+    }
+
+    .chart-card .card-header,
+    .data-card .card-header {
+        background: #fff;
+        border-bottom: 1px solid var(--dash-border);
+        padding: 12px 16px;
+    }
+
+    .chart-title {
+        margin: 0;
+        color: #0f172a;
+        font-size: 0.95rem;
+        font-weight: 700;
+    }
+
+    .chart-subtitle {
+        margin: 2px 0 0;
+        color: #64748b;
+        font-size: 0.78rem;
+    }
+
+    .chart-card .card-body {
+        padding: 14px 16px 12px;
+    }
+
+    .chart-wrap {
+        position: relative;
+        min-height: 280px;
+    }
+
+    .chart-wrap.compact {
+        min-height: 240px;
+    }
+
+    .analytics-table {
         width: 100%;
         border-collapse: collapse;
-        min-width: 680px;
     }
 
-    .dash-table th,
-    .dash-table td {
-        padding: 12px;
-        border-bottom: 1px solid #e8edf5;
-        text-align: left;
-        font-size: 0.88rem;
+    .analytics-table th,
+    .analytics-table td {
+        padding: 11px;
+        border-bottom: 1px solid #edf2f8;
+        font-size: 0.86rem;
+        vertical-align: middle;
     }
 
-    .dash-table th {
+    .analytics-table th {
         color: #475569;
         font-weight: 600;
         background: #f8fbff;
     }
 
-    .dash-table tbody tr:nth-child(even) {
-        background: #fcfdff;
-    }
-
-    .dash-table tbody tr:hover {
-        background: #f3f8ff;
+    .analytics-table tbody tr:hover {
+        background: #f7faff;
     }
 
     .status-badge {
         display: inline-flex;
         align-items: center;
         border-radius: 999px;
-        padding: 4px 10px;
-        font-size: 0.75rem;
+        padding: 3px 9px;
+        font-size: 0.74rem;
         font-weight: 600;
     }
 
-    .status-paid { background: #dcfce7; color: #166534; }
-    .status-partial { background: #ffedd5; color: #9a3412; }
+    .status-paid {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .status-partial {
+        background: #ffedd5;
+        color: #9a3412;
+    }
 
     .list-panel {
-        padding: 10px 16px 16px;
+        padding: 10px 16px 14px;
     }
 
     .list-row {
@@ -377,112 +506,103 @@ $dashboardInsights['empty_state'] = empty($recent_sales) && empty($top_products)
         align-items: center;
         justify-content: space-between;
         gap: 12px;
-        padding: 12px 0;
-        border-bottom: 1px solid #eef2f7;
-        font-size: 0.88rem;
+        padding: 11px 0;
+        border-bottom: 1px solid #edf2f8;
     }
 
     .list-row:last-child {
         border-bottom: 0;
     }
 
-    .list-row .meta {
-        color: var(--dash-muted);
-        font-size: 0.78rem;
-        margin-top: 2px;
-    }
-
-    .metric-chip {
-        display: inline-flex;
-        align-items: center;
-        border-radius: 999px;
-        background: #eff6ff;
-        color: #1d4ed8;
-        padding: 4px 10px;
-        font-size: 0.78rem;
+    .list-name {
+        color: #0f172a;
+        font-size: 0.87rem;
         font-weight: 600;
     }
 
-    .empty-state {
-        padding: 18px;
-        text-align: center;
+    .list-meta {
         color: #64748b;
-        font-size: 0.88rem;
-        border: 1px dashed #dbe3ef;
-        border-radius: 8px;
-        background: #fbfdff;
+        font-size: 0.77rem;
+        margin-top: 3px;
     }
 
-    .skeleton {
-        position: relative;
-        overflow: hidden;
-        background: #edf2f7;
-        border-radius: 8px;
+    .list-chip {
+        border-radius: 999px;
+        background: #eef2ff;
+        color: #3730a3;
+        padding: 4px 9px;
+        font-size: 0.75rem;
+        font-weight: 600;
     }
 
-    .skeleton::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        transform: translateX(-100%);
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.75), transparent);
-        animation: dashShimmer 1.2s infinite;
-    }
-
-    @keyframes dashShimmer {
-        100% { transform: translateX(100%); }
-    }
-
-    .charts-loading {
-        padding: 16px;
+    .supplies-summary {
         display: grid;
-        gap: 12px;
-    }
-
-    .charts-loading .skeleton {
-        height: 220px;
-    }
-
-    .supplies-card-body {
-        padding: 12px 16px 16px;
-    }
-
-    .supplies-skeleton {
-        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 10px;
+        margin-top: 10px;
     }
 
-    .supplies-skeleton .skeleton {
-        height: 44px;
-        border-radius: 8px;
+    .supplies-summary .box {
+        border: 1px solid #e8eef8;
+        border-radius: 10px;
+        padding: 10px;
+        background: #fafcff;
+    }
+
+    .supplies-summary .box .label {
+        color: #64748b;
+        font-size: 0.76rem;
+        margin-bottom: 2px;
+    }
+
+    .supplies-summary .box .value {
+        color: #0f172a;
+        font-size: 1rem;
+        font-weight: 700;
     }
 
     .supplies-table-wrap {
         overflow-x: auto;
-        border: 1px solid #e8edf5;
+        border: 1px solid #e8eef8;
+        border-radius: 10px;
+    }
+
+    .supplies-table-wrap .analytics-table {
+        min-width: 1020px;
+    }
+
+    .supplies-loading {
+        display: grid;
+        gap: 8px;
+        padding: 10px 0;
+    }
+
+    .skeleton {
+        height: 42px;
         border-radius: 8px;
+        background: linear-gradient(95deg, #e8eef8 8%, #f8fbff 42%, #e8eef8 72%);
+        background-size: 200% 100%;
+        animation: pulseX 1.15s linear infinite;
     }
 
-    .supplies-table-wrap .dash-table {
-        min-width: 1080px;
+    @keyframes pulseX {
+        0% {
+            background-position: 200% 0;
+        }
+
+        100% {
+            background-position: -200% 0;
+        }
     }
 
-    .supplies-cost {
-        font-weight: 700;
-        color: #0f172a;
-    }
-
-    .hidden-until-ready {
-        display: block;
-    }
-
-    .only-loading {
-        display: none;
-    }
-
-    .focus-outline:focus {
-        outline: 2px solid #2563eb;
-        outline-offset: 2px;
+    .empty-state {
+        padding: 14px;
+        border: 1px dashed #cbd9ee;
+        border-radius: 10px;
+        background: #fbfdff;
+        color: #64748b;
+        font-size: 0.86rem;
+        text-align: center;
     }
 
     @media (max-width: 1199.98px) {
@@ -490,226 +610,223 @@ $dashboardInsights['empty_state'] = empty($recent_sales) && empty($top_products)
             padding: 16px;
         }
 
-        .search-toolbar {
-            min-width: 100%;
+        .chart-wrap {
+            min-height: 260px;
         }
     }
 
     @media (max-width: 991.98px) {
-        .dash-header {
-            flex-direction: column;
-            align-items: stretch;
+        .hero-title {
+            font-size: 1.22rem;
         }
 
-        .insight-grid {
+        .supplies-summary {
             grid-template-columns: 1fr;
         }
     }
 </style>
 
-<div class="dashboard-shell" id="dashboardShell">
-    <div class="dash-header">
-        <div>
-            <h1 class="dash-title">Dashboard</h1>
-            <p class="dash-subtitle">Operational analytics, inventory health, and sales activity overview.</p>
+<div class="dashboard-shell">
+    <section class="hero-band" aria-labelledby="analyticsHeading">
+        <h1 id="analyticsHeading" class="hero-title">Business Analytics Dashboard</h1>
+        <p class="hero-subtitle">Live insights from sales, purchases, expenses, stock levels, and payment behavior.</p>
+        <div class="hero-stats">
+            <span class="hero-chip"><i class="far fa-calendar-alt"></i> <?php echo date('F Y'); ?></span>
+            <span class="hero-chip"><i class="fas fa-boxes"></i> <?php echo number_format($kpi['total_products']); ?> products tracked</span>
+            <span class="hero-chip"><i class="fas fa-exclamation-triangle"></i> <?php echo number_format($kpi['low_stock_count']); ?> low stock alerts</span>
         </div>
-        <div class="search-toolbar" role="search" aria-label="Dashboard search">
-            <i class="fas fa-search search-icon" aria-hidden="true"></i>
-            <input
-                id="dashboardSearch"
-                type="search"
-                placeholder="Search invoices, customers, products..."
-                aria-label="Search dashboard data"
-                class="focus-outline"
-            >
-            <button id="dashboardFilterBtn" type="button" aria-label="Toggle quick filter" class="focus-outline">
-                <i class="fas fa-sliders-h mr-1" aria-hidden="true"></i> Filters
-            </button>
-        </div>
-    </div>
+    </section>
 
     <?php if ($analyticsError): ?>
         <div class="alert alert-danger mb-3" role="alert">
-            <i class="fas fa-exclamation-triangle mr-1" aria-hidden="true"></i>
-            <?php echo htmlspecialchars($analyticsError); ?>
+            <i class="fas fa-exclamation-triangle mr-1"></i>
+            <?php echo htmlspecialchars($analyticsError, ENT_QUOTES, 'UTF-8'); ?>
         </div>
     <?php endif; ?>
 
-    <div class="row mb-3">
-        <div class="col-12">
-            <section class="dash-panel" aria-labelledby="officeSuppliesHeading">
-                <div class="section-head">
-                    <h2 id="officeSuppliesHeading" class="section-title">Office Supplies</h2>
-                    <div class="section-actions">
-                        <span class="metric-chip" id="officeSuppliesCount">Loading...</span>
-                    </div>
-                </div>
-                <div class="supplies-card-body">
-                    <div id="officeSuppliesLoading" class="supplies-skeleton" aria-hidden="true">
-                        <div class="skeleton"></div>
-                        <div class="skeleton"></div>
-                        <div class="skeleton"></div>
-                        <div class="skeleton"></div>
-                    </div>
-
-                    <div id="officeSuppliesContainer" class="supplies-table-wrap" style="display: none;">
-                        <table class="dash-table" id="officeSuppliesTable">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Category ID</th>
-                                    <th>Item Name</th>
-                                    <th>Category</th>
-                                    <th>Description</th>
-                                    <th>Unit Cost</th>
-                                    <th>Stocks</th>
-                                    <th>Created</th>
-                                    <th>Updated</th>
-                                </tr>
-                            </thead>
-                            <tbody id="officeSuppliesTbody"></tbody>
-                        </table>
-                    </div>
-
-                    <div id="officeSuppliesEmpty" class="empty-state mt-2" style="display: none;">
-                        No office supplies found.
-                    </div>
-                </div>
-            </section>
-        </div>
-    </div>
-
-    <div class="row" style="row-gap: 16px;">
-        <div class="col-12 col-sm-6 col-lg-3">
-            <article class="dash-panel kpi-card" aria-label="Sales this month">
-                <span class="kpi-icon primary"><i class="fas fa-chart-line" aria-hidden="true"></i></span>
-                <div>
-                    <div class="kpi-label">Sales (This Month)</div>
-                    <div class="kpi-value">$<?php echo number_format($stats['sales_month'], 2); ?></div>
+    <div class="row" style="row-gap: 12px;">
+        <div class="col-12 col-sm-6 col-xl-3">
+            <article class="card metric-card">
+                <div class="card-body">
+                    <div class="metric-label">Sales (<?php echo htmlspecialchars($focusMonthLabel, ENT_QUOTES, 'UTF-8'); ?>)</div>
+                    <p class="metric-value">$<?php echo number_format($kpi['sales_month'], 2); ?></p>
+                    <span class="metric-note"><span class="badge-analytics badge-primary-soft">Revenue</span></span>
                 </div>
             </article>
         </div>
-        <div class="col-12 col-sm-6 col-lg-3">
-            <article class="dash-panel kpi-card" aria-label="Purchases this month">
-                <span class="kpi-icon success"><i class="fas fa-truck-loading" aria-hidden="true"></i></span>
-                <div>
-                    <div class="kpi-label">Purchases (This Month)</div>
-                    <div class="kpi-value">$<?php echo number_format($stats['purchase_month'], 2); ?></div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <article class="card metric-card">
+                <div class="card-body">
+                    <div class="metric-label">Purchases (<?php echo htmlspecialchars($focusMonthLabel, ENT_QUOTES, 'UTF-8'); ?>)</div>
+                    <p class="metric-value">$<?php echo number_format($kpi['purchase_month'], 2); ?></p>
+                    <span class="metric-note"><span class="badge-analytics badge-warning-soft">Cost of Stock</span></span>
                 </div>
             </article>
         </div>
-        <div class="col-12 col-sm-6 col-lg-3">
-            <article class="dash-panel kpi-card" aria-label="Low stock items">
-                <span class="kpi-icon danger"><i class="fas fa-box-open" aria-hidden="true"></i></span>
-                <div>
-                    <div class="kpi-label">Low Stock Items</div>
-                    <div class="kpi-value"><?php echo number_format($stats['low_stock_count']); ?> / <?php echo number_format($stats['total_products']); ?></div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <article class="card metric-card">
+                <div class="card-body">
+                    <div class="metric-label">Operating Expense (<?php echo htmlspecialchars($focusMonthLabel, ENT_QUOTES, 'UTF-8'); ?>)</div>
+                    <p class="metric-value">$<?php echo number_format($kpi['expense_month'], 2); ?></p>
+                    <span class="metric-note"><span class="badge-analytics badge-warning-soft">This Month</span></span>
                 </div>
             </article>
         </div>
-        <div class="col-12 col-sm-6 col-lg-3">
-            <article class="dash-panel kpi-card" aria-label="Outstanding sales due">
-                <span class="kpi-icon warning"><i class="fas fa-receipt" aria-hidden="true"></i></span>
-                <div>
-                    <div class="kpi-label">Sales Due</div>
-                    <div class="kpi-value">$<?php echo number_format($stats['due_sales'], 2); ?></div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <article class="card metric-card">
+                <div class="card-body">
+                    <div class="metric-label">Estimated Net (<?php echo htmlspecialchars($focusMonthLabel, ENT_QUOTES, 'UTF-8'); ?>)</div>
+                    <p class="metric-value">$<?php echo number_format($kpi['profit_month'], 2); ?></p>
+                    <span class="metric-note">
+                        <span class="badge-analytics <?php echo $kpi['profit_month'] >= 0 ? 'badge-success-soft' : 'badge-warning-soft'; ?>">
+                            <?php echo $kpi['profit_month'] >= 0 ? 'Positive' : 'Negative'; ?>
+                        </span>
+                    </span>
+                </div>
+            </article>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <article class="card metric-card">
+                <div class="card-body">
+                    <div class="metric-label">Collection Rate (<?php echo htmlspecialchars($focusMonthLabel, ENT_QUOTES, 'UTF-8'); ?>)</div>
+                    <p class="metric-value"><?php echo number_format($kpi['collection_rate_month'], 1); ?>%</p>
+                    <span class="metric-note">Based on paid vs billed sales</span>
+                </div>
+            </article>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <article class="card metric-card">
+                <div class="card-body">
+                    <div class="metric-label">Inventory Health</div>
+                    <p class="metric-value"><?php echo number_format($kpi['inventory_health'], 1); ?>%</p>
+                    <span class="metric-note">Healthy vs low stock ratio</span>
+                </div>
+            </article>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <article class="card metric-card">
+                <div class="card-body">
+                    <div class="metric-label">Sales Due (Total)</div>
+                    <p class="metric-value">$<?php echo number_format($kpi['sales_due_total'], 2); ?></p>
+                    <span class="metric-note">Outstanding customer balance</span>
+                </div>
+            </article>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <article class="card metric-card">
+                <div class="card-body">
+                    <div class="metric-label">Purchase Due (Total)</div>
+                    <p class="metric-value">$<?php echo number_format($kpi['purchase_due_total'], 2); ?></p>
+                    <span class="metric-note">Outstanding supplier balance</span>
                 </div>
             </article>
         </div>
     </div>
 
-    <section class="dash-panel mt-3 p-3" aria-labelledby="insightHeading">
-        <div class="d-flex justify-content-between align-items-center mb-3" style="gap: 8px;">
-            <h2 id="insightHeading" class="section-title">Analytics Snapshot</h2>
-            <span class="metric-chip"><?php echo date('M d, Y'); ?></span>
+    <?php if ($isAnalyticsEmpty): ?>
+        <div class="empty-state mt-3">
+            No analytics records are available yet. Add sales, purchases, expenses, and products to populate this dashboard.
         </div>
-        <div class="insight-grid">
-            <div class="insight-box">
-                <div class="label">Net Cash Flow</div>
-                <div class="value">$<?php echo number_format($dashboardInsights['net_cash_flow'], 2); ?></div>
-            </div>
-            <div class="insight-box">
-                <div class="label">Collection Rate</div>
-                <div class="value"><?php echo number_format($dashboardInsights['collection_rate'], 1); ?>%</div>
-            </div>
-            <div class="insight-box">
-                <div class="label">Inventory Health</div>
-                <div class="value"><?php echo number_format($dashboardInsights['inventory_health'], 1); ?>%</div>
-            </div>
-        </div>
-        <?php if ($dashboardInsights['empty_state']): ?>
-            <div class="empty-state mt-3">
-                <i class="fas fa-info-circle mr-1" aria-hidden="true"></i>
-                No operational records yet. Add products, purchases, or sales to populate analytics.
-            </div>
-        <?php endif; ?>
-    </section>
+    <?php endif; ?>
 
-    <div class="row mt-3" style="row-gap: 16px;">
+    <div class="row mt-3" style="row-gap: 12px;">
         <div class="col-lg-8">
-            <section class="dash-panel" aria-labelledby="trendHeading">
-                <div class="section-head">
-                    <h2 id="trendHeading" class="section-title">Sales vs Purchase Trend</h2>
+            <section class="card chart-card" aria-labelledby="trendAnalyticsHeading">
+                <div class="card-header d-flex justify-content-between align-items-center" style="gap: 8px;">
+                    <div>
+                        <h2 id="trendAnalyticsHeading" class="chart-title">6-Month Revenue, Purchase, and Expense Trend</h2>
+                        <p class="chart-subtitle">Compare business inflow and outflow month by month.</p>
+                    </div>
+                    <span class="badge-analytics badge-primary-soft">Last 6 Months</span>
                 </div>
-                <div class="only-loading charts-loading" aria-hidden="true">
-                    <div class="skeleton"></div>
-                </div>
-                <div class="hidden-until-ready p-3">
-                    <canvas id="trendChart" style="height: 240px;"></canvas>
+                <div class="card-body">
+                    <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
                 </div>
             </section>
         </div>
         <div class="col-lg-4">
-            <section class="dash-panel" aria-labelledby="stockHeading">
-                <div class="section-head">
-                    <h2 id="stockHeading" class="section-title">Stock Distribution</h2>
+            <section class="card chart-card" aria-labelledby="stockDistributionHeading">
+                <div class="card-header">
+                    <h2 id="stockDistributionHeading" class="chart-title">Stock Distribution</h2>
+                    <p class="chart-subtitle">Healthy, low, and out-of-stock products.</p>
                 </div>
-                <div class="only-loading charts-loading" aria-hidden="true">
-                    <div class="skeleton"></div>
-                </div>
-                <div class="hidden-until-ready p-3">
-                    <canvas id="stockChart" style="height: 240px;"></canvas>
+                <div class="card-body">
+                    <div class="chart-wrap compact"><canvas id="stockChart"></canvas></div>
                 </div>
             </section>
         </div>
     </div>
 
-    <div class="row mt-3" style="row-gap: 16px;">
-        <div class="col-lg-8">
-            <section class="dash-panel" aria-labelledby="recentHeading">
-                <div class="section-head">
-                    <h2 id="recentHeading" class="section-title">Recent Sales</h2>
-                    <div class="section-actions">
-                        <a href="index.php?page=sell_list" class="btn btn-sm btn-outline-primary focus-outline">View All</a>
-                    </div>
+    <div class="row mt-3" style="row-gap: 12px;">
+        <div class="col-lg-6">
+            <section class="card chart-card" aria-labelledby="productRankHeading">
+                <div class="card-header">
+                    <h2 id="productRankHeading" class="chart-title">Top Products by Units Sold</h2>
+                    <p class="chart-subtitle">From invoice line-item quantity.</p>
                 </div>
-                <div class="table-wrap">
-                    <table class="dash-table" id="recentSalesTable">
+                <div class="card-body">
+                    <div class="chart-wrap compact"><canvas id="topProductsChart"></canvas></div>
+                </div>
+            </section>
+        </div>
+        <div class="col-lg-3">
+            <section class="card chart-card" aria-labelledby="paymentMixHeading">
+                <div class="card-header">
+                    <h2 id="paymentMixHeading" class="chart-title">Payment Mix</h2>
+                    <p class="chart-subtitle">Current month sales split.</p>
+                </div>
+                <div class="card-body">
+                    <div class="chart-wrap compact"><canvas id="paymentChart"></canvas></div>
+                </div>
+            </section>
+        </div>
+        <div class="col-lg-3">
+            <section class="card chart-card" aria-labelledby="categoryMixHeading">
+                <div class="card-header">
+                    <h2 id="categoryMixHeading" class="chart-title">Category Demand</h2>
+                    <p class="chart-subtitle">Units sold by category.</p>
+                </div>
+                <div class="card-body">
+                    <div class="chart-wrap compact"><canvas id="categoryChart"></canvas></div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="row mt-3" style="row-gap: 12px;">
+        <div class="col-lg-8">
+            <section class="card data-card" aria-labelledby="recentSalesHeading">
+                <div class="card-header d-flex justify-content-between align-items-center" style="gap: 8px;">
+                    <h2 id="recentSalesHeading" class="chart-title">Recent Sales</h2>
+                    <a href="index.php?page=sell_list" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body p-0" style="overflow-x: auto;">
+                    <table class="analytics-table">
                         <thead>
                             <tr>
                                 <th>Invoice #</th>
                                 <th>Customer</th>
                                 <th>Date</th>
                                 <th>Total</th>
+                                <th>Payment Type</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php if (empty($recent_sales)): ?>
+                            <?php if (empty($recentSales)): ?>
                                 <tr>
-                                    <td colspan="5">
-                                        <div class="empty-state">No recent sales available.</div>
-                                    </td>
+                                    <td colspan="6"><div class="empty-state m-2">No recent sales available.</div></td>
                                 </tr>
                             <?php else: ?>
-                                <?php foreach ($recent_sales as $sale): ?>
-                                    <tr class="search-row" data-search="<?php echo htmlspecialchars(strtolower(($sale['invoice_number'] ?? '') . ' ' . ($sale['customer_name'] ?? ''))); ?>">
-                                        <td><?php echo htmlspecialchars($sale['invoice_number'] ?? 'N/A'); ?></td>
-                                        <td><?php echo htmlspecialchars($sale['customer_name'] ?? 'N/A'); ?></td>
+                                <?php foreach ($recentSales as $sale): ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($sale['invoice_number'] ?? 'N/A', ENT_QUOTES, 'UTF-8'); ?></td>
+                                        <td><?php echo htmlspecialchars($sale['customer_name'] ?? 'N/A', ENT_QUOTES, 'UTF-8'); ?></td>
                                         <td><?php echo !empty($sale['order_date']) ? date('M d, Y', strtotime($sale['order_date'])) : 'N/A'; ?></td>
                                         <td>$<?php echo number_format((float) ($sale['net_total'] ?? 0), 2); ?></td>
+                                        <td><?php echo htmlspecialchars($sale['payment_type'] ?? 'N/A', ENT_QUOTES, 'UTF-8'); ?></td>
                                         <td>
-                                            <?php if (((float) ($sale['due_amount'] ?? 0)) > 0): ?>
+                                            <?php if ((float) ($sale['due_amount'] ?? 0) > 0): ?>
                                                 <span class="status-badge status-partial">Partial</span>
                                             <?php else: ?>
                                                 <span class="status-badge status-paid">Paid</span>
@@ -725,42 +842,21 @@ $dashboardInsights['empty_state'] = empty($recent_sales) && empty($top_products)
         </div>
 
         <div class="col-lg-4">
-            <section class="dash-panel" aria-labelledby="topProductHeading">
-                <div class="section-head">
-                    <h2 id="topProductHeading" class="section-title">Top Products</h2>
+            <section class="card data-card" aria-labelledby="lowStockHeading">
+                <div class="card-header">
+                    <h2 id="lowStockHeading" class="chart-title">Low Stock Alerts</h2>
                 </div>
-                <div class="list-panel" id="topProductsList">
-                    <?php if (empty($top_products)): ?>
-                        <div class="empty-state">No product sales data yet.</div>
+                <div class="list-panel">
+                    <?php if (empty($lowStockItems)): ?>
+                        <div class="empty-state">All products are above alert quantity.</div>
                     <?php else: ?>
-                        <?php foreach ($top_products as $index => $prod): ?>
-                            <div class="list-row search-row" data-search="<?php echo htmlspecialchars(strtolower($prod['product_name'] ?? '')); ?>">
+                        <?php foreach ($lowStockItems as $item): ?>
+                            <div class="list-row">
                                 <div>
-                                    <div><strong>#<?php echo $index + 1; ?></strong> <?php echo htmlspecialchars($prod['product_name'] ?? 'N/A'); ?></div>
-                                    <div class="meta">Top performing item</div>
+                                    <div class="list-name"><?php echo htmlspecialchars($item['product_name'] ?? 'N/A', ENT_QUOTES, 'UTF-8'); ?></div>
+                                    <div class="list-meta">Alert: <?php echo (int) ($item['alert_quanttity'] ?? 0); ?></div>
                                 </div>
-                                <span class="metric-chip"><?php echo (int) ($prod['qty'] ?? 0); ?> sold</span>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </div>
-            </section>
-
-            <section class="dash-panel mt-3" aria-labelledby="lowStockHeading">
-                <div class="section-head">
-                    <h2 id="lowStockHeading" class="section-title">Low Stock Alerts</h2>
-                </div>
-                <div class="list-panel" id="lowStockList">
-                    <?php if (empty($low_stock_items)): ?>
-                        <div class="empty-state">All stock levels are currently healthy.</div>
-                    <?php else: ?>
-                        <?php foreach ($low_stock_items as $item): ?>
-                            <div class="list-row search-row" data-search="<?php echo htmlspecialchars(strtolower($item['product_name'] ?? '')); ?>">
-                                <div>
-                                    <div><?php echo htmlspecialchars($item['product_name'] ?? 'N/A'); ?></div>
-                                    <div class="meta">Alert qty: <?php echo (int) ($item['alert_quanttity'] ?? 0); ?></div>
-                                </div>
-                                <span class="status-badge status-partial"><?php echo (int) ($item['quantity'] ?? 0); ?> left</span>
+                                <span class="list-chip"><?php echo (int) ($item['quantity'] ?? 0); ?> left</span>
                             </div>
                         <?php endforeach; ?>
                     <?php endif; ?>
@@ -769,153 +865,358 @@ $dashboardInsights['empty_state'] = empty($recent_sales) && empty($top_products)
         </div>
     </div>
 
+    <div class="row mt-3">
+        <div class="col-12">
+            <section class="card data-card" aria-labelledby="officeSuppliesHeading">
+                <div class="card-header d-flex justify-content-between align-items-center" style="gap: 10px;">
+                    <h2 id="officeSuppliesHeading" class="chart-title">Office Supplies Snapshot</h2>
+                    <span class="badge-analytics badge-primary-soft" id="officeSuppliesCount">
+                        <?php echo number_format($officeSuppliesSummary['total_items']); ?> items
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="supplies-summary">
+                        <div class="box">
+                            <div class="label">Total Items</div>
+                            <div class="value" id="officeSuppliesTotalItems"><?php echo number_format($officeSuppliesSummary['total_items']); ?></div>
+                        </div>
+                        <div class="box">
+                            <div class="label">Stock Units</div>
+                            <div class="value" id="officeSuppliesStockUnits"><?php echo number_format($officeSuppliesSummary['total_stock_units']); ?></div>
+                        </div>
+                        <div class="box">
+                            <div class="label">Estimated Stock Value</div>
+                            <div class="value" id="officeSuppliesStockValue">$<?php echo number_format($officeSuppliesSummary['estimated_stock_value'], 2); ?></div>
+                        </div>
+                    </div>
+
+                    <div id="officeSuppliesLoading" class="supplies-loading mt-3" aria-hidden="true" style="display:none;">
+                        <div class="skeleton"></div>
+                        <div class="skeleton"></div>
+                        <div class="skeleton"></div>
+                    </div>
+
+                    <div id="officeSuppliesContainer" class="supplies-table-wrap mt-3" style="display: none;">
+                        <table class="analytics-table" id="officeSuppliesTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Category</th>
+                                    <th>Item Name</th>
+                                    <th>Description</th>
+                                    <th>Unit Cost</th>
+                                    <th>Stocks</th>
+                                    <th>Created</th>
+                                    <th>Updated</th>
+                                </tr>
+                            </thead>
+                            <tbody id="officeSuppliesTbody"></tbody>
+                        </table>
+                    </div>
+
+                    <div id="officeSuppliesEmpty" class="empty-state mt-3" style="display:none;">
+                        No office supplies found.
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
 </div>
 
 <script>
 (function () {
-    function debounce(fn, delay) {
-        let timer;
-        return function (...args) {
-            clearTimeout(timer);
-            timer = setTimeout(() => fn.apply(this, args), delay);
-        };
-    }
-
-    function normalize(value) {
-        return (value || '').toString().toLowerCase().trim();
-    }
-
-    function filterSearchables(term) {
-        const rows = document.querySelectorAll('.search-row');
-        let visible = 0;
-        rows.forEach((row) => {
-            const text = normalize(row.getAttribute('data-search'));
-            const show = !term || text.includes(term);
-            row.style.display = show ? '' : 'none';
-            if (show) visible += 1;
+    function money(value) {
+        return '$' + Number(value || 0).toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
         });
+    }
 
-        const tableBody = document.querySelector('#recentSalesTable tbody');
-        if (tableBody) {
-            const existingEmpty = tableBody.querySelector('.dynamic-empty');
-            if (existingEmpty) existingEmpty.remove();
-            const tableRows = tableBody.querySelectorAll('tr.search-row');
-            const shownRows = Array.from(tableRows).filter((r) => r.style.display !== 'none').length;
-            if (tableRows.length > 0 && shownRows === 0) {
-                const tr = document.createElement('tr');
-                tr.className = 'dynamic-empty';
-                tr.innerHTML = '<td colspan="5"><div class="empty-state">No matches found for your search.</div></td>';
-                tableBody.appendChild(tr);
-            }
+    const monthLabels = <?php echo json_encode($chart['months']); ?>;
+    const salesSeries = <?php echo json_encode(array_values($chart['sales'])); ?>;
+    const purchaseSeries = <?php echo json_encode(array_values($chart['purchases'])); ?>;
+    const expenseSeries = <?php echo json_encode(array_values($chart['expenses'])); ?>;
+    const netSeries = <?php echo json_encode($netTrend); ?>;
+
+    const stockSeries = <?php echo json_encode($chart['stock_status']); ?>;
+    const paymentLabels = <?php echo json_encode($chart['payment_labels']); ?>;
+    const paymentValues = <?php echo json_encode($chart['payment_values']); ?>;
+    const topProductLabels = <?php echo json_encode($chart['top_product_labels']); ?>;
+    const topProductValues = <?php echo json_encode($chart['top_product_values']); ?>;
+    const categoryLabels = <?php echo json_encode($chart['category_labels']); ?>;
+    const categoryValues = <?php echo json_encode($chart['category_values']); ?>;
+
+    const chartFont = "'Inter', 'Segoe UI', sans-serif";
+
+    function getGridColor(alpha) {
+        return 'rgba(100, 116, 139, ' + alpha + ')';
+    }
+
+    function createGradient(ctx, from, to) {
+        const gradient = ctx.createLinearGradient(0, 0, 0, 320);
+        gradient.addColorStop(0, from);
+        gradient.addColorStop(1, to);
+        return gradient;
+    }
+
+    if (typeof Chart !== 'undefined') {
+        Chart.defaults.color = '#334155';
+        Chart.defaults.font.family = chartFont;
+
+        const trendEl = document.getElementById('trendChart');
+        if (trendEl) {
+            const tctx = trendEl.getContext('2d');
+            const salesFill = createGradient(tctx, 'rgba(37, 99, 235, 0.32)', 'rgba(37, 99, 235, 0.02)');
+
+            new Chart(tctx, {
+                data: {
+                    labels: monthLabels,
+                    datasets: [
+                        {
+                            type: 'line',
+                            label: 'Sales',
+                            data: salesSeries,
+                            borderColor: '#2563eb',
+                            backgroundColor: salesFill,
+                            fill: true,
+                            tension: 0.36,
+                            borderWidth: 2.4,
+                            pointRadius: 2.8,
+                            pointHoverRadius: 4
+                        },
+                        {
+                            type: 'line',
+                            label: 'Purchases',
+                            data: purchaseSeries,
+                            borderColor: '#0f766e',
+                            backgroundColor: 'rgba(15, 118, 110, 0.08)',
+                            fill: false,
+                            tension: 0.33,
+                            borderDash: [6, 4],
+                            borderWidth: 2.1,
+                            pointRadius: 2.5
+                        },
+                        {
+                            type: 'bar',
+                            label: 'Expenses',
+                            data: expenseSeries,
+                            backgroundColor: 'rgba(234, 88, 12, 0.35)',
+                            borderColor: 'rgba(234, 88, 12, 0.8)',
+                            borderWidth: 1,
+                            borderRadius: 8,
+                            maxBarThickness: 24
+                        },
+                        {
+                            type: 'line',
+                            label: 'Net',
+                            data: netSeries,
+                            borderColor: '#4338ca',
+                            backgroundColor: 'rgba(67, 56, 202, 0.08)',
+                            fill: false,
+                            tension: 0.3,
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            pointHoverRadius: 3
+                        }
+                    ]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                usePointStyle: true,
+                                boxWidth: 10,
+                                boxHeight: 10,
+                                padding: 14
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (ctx) {
+                                    return ctx.dataset.label + ': ' + money(ctx.parsed.y);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: getGridColor(0.2)
+                            },
+                            ticks: {
+                                callback: function (value) {
+                                    return '$' + Number(value).toLocaleString();
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
         }
 
-        return visible;
-    }
-
-    const searchInput = document.getElementById('dashboardSearch');
-    const filterBtn = document.getElementById('dashboardFilterBtn');
-
-    if (searchInput) {
-        const onSearch = debounce((event) => {
-            filterSearchables(normalize(event.target.value));
-        }, 280);
-        searchInput.addEventListener('input', onSearch);
-    }
-
-    if (filterBtn) {
-        filterBtn.addEventListener('click', function () {
-            const onlyLowStock = this.getAttribute('data-low-only') === '1';
-            this.setAttribute('data-low-only', onlyLowStock ? '0' : '1');
-            this.innerHTML = onlyLowStock
-                ? '<i class="fas fa-sliders-h mr-1" aria-hidden="true"></i> Filters'
-                : '<i class="fas fa-filter mr-1" aria-hidden="true"></i> Low Stock';
-
-            const lowStockList = document.getElementById('lowStockList');
-            const topProductsList = document.getElementById('topProductsList');
-            if (lowStockList && topProductsList) {
-                if (onlyLowStock) {
-                    topProductsList.style.opacity = '1';
-                    lowStockList.style.opacity = '1';
-                } else {
-                    topProductsList.style.opacity = '0.35';
-                    lowStockList.style.opacity = '1';
+        const stockEl = document.getElementById('stockChart');
+        if (stockEl) {
+            new Chart(stockEl.getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Healthy', 'Low Stock', 'Out of Stock'],
+                    datasets: [{
+                        data: stockSeries,
+                        backgroundColor: ['#22c55e', '#f59e0b', '#ef4444'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    cutout: '66%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 11,
+                                padding: 11
+                            }
+                        }
+                    }
                 }
-            }
-        });
+            });
+        }
+
+        const topProductsEl = document.getElementById('topProductsChart');
+        if (topProductsEl) {
+            new Chart(topProductsEl.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: topProductLabels,
+                    datasets: [{
+                        label: 'Units Sold',
+                        data: topProductValues,
+                        backgroundColor: '#4f46e5cc',
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            grid: { color: getGridColor(0.14) }
+                        },
+                        y: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        const paymentEl = document.getElementById('paymentChart');
+        if (paymentEl) {
+            new Chart(paymentEl.getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: paymentLabels.length ? paymentLabels : ['No Data'],
+                    datasets: [{
+                        data: paymentValues.length ? paymentValues : [1],
+                        backgroundColor: paymentValues.length
+                            ? ['#2563eb', '#0f766e', '#f59e0b', '#7c3aed', '#e11d48', '#0891b2']
+                            : ['#cbd5e1'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    cutout: '62%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { boxWidth: 10, padding: 8 }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (ctx) {
+                                    if (!paymentValues.length) return 'No Data';
+                                    return ctx.label + ': ' + money(ctx.parsed);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        const categoryEl = document.getElementById('categoryChart');
+        if (categoryEl) {
+            new Chart(categoryEl.getContext('2d'), {
+                type: 'polarArea',
+                data: {
+                    labels: categoryLabels.length ? categoryLabels : ['No Data'],
+                    datasets: [{
+                        data: categoryValues.length ? categoryValues : [1],
+                        backgroundColor: categoryValues.length
+                            ? ['#2563eb99', '#0f766e99', '#f59e0b99', '#7c3aed99', '#e11d4899', '#0891b299']
+                            : ['#cbd5e1'],
+                        borderWidth: 1,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            grid: { color: getGridColor(0.2) },
+                            angleLines: { color: getGridColor(0.2) }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { boxWidth: 10, padding: 8 }
+                        }
+                    }
+                }
+            });
+        }
     }
 
-    const trendCtx = document.getElementById('trendChart');
-    const stockCtx = document.getElementById('stockChart');
     const suppliesLoading = document.getElementById('officeSuppliesLoading');
     const suppliesContainer = document.getElementById('officeSuppliesContainer');
     const suppliesEmpty = document.getElementById('officeSuppliesEmpty');
     const suppliesTbody = document.getElementById('officeSuppliesTbody');
     const suppliesCount = document.getElementById('officeSuppliesCount');
+    const suppliesItemsEl = document.getElementById('officeSuppliesTotalItems');
+    const suppliesUnitsEl = document.getElementById('officeSuppliesStockUnits');
+    const suppliesValueEl = document.getElementById('officeSuppliesStockValue');
 
-    if (trendCtx && stockCtx && typeof Chart !== 'undefined') {
-        new Chart(trendCtx.getContext('2d'), {
-            type: 'line',
-            data: {
-                labels: <?php echo json_encode($chart_data['months']); ?>,
-                datasets: [
-                    {
-                        label: 'Sales',
-                        borderColor: '#1d4ed8',
-                        backgroundColor: 'rgba(29, 78, 216, 0.08)',
-                        data: <?php echo json_encode(array_values($chart_data['sales'])); ?>,
-                        borderWidth: 2,
-                        tension: 0.35,
-                        fill: true,
-                        pointRadius: 3,
-                    },
-                    {
-                        label: 'Purchases',
-                        borderColor: '#15803d',
-                        backgroundColor: 'rgba(21, 128, 61, 0.06)',
-                        data: <?php echo json_encode(array_values($chart_data['purchases'])); ?>,
-                        borderWidth: 2,
-                        tension: 0.35,
-                        fill: true,
-                        pointRadius: 3,
-                    }
-                ]
-            },
-            options: {
-                maintainAspectRatio: false,
-                responsive: true,
-                plugins: {
-                    legend: { position: 'top' }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: { color: 'rgba(148, 163, 184, 0.18)' }
-                    },
-                    x: {
-                        grid: { display: false }
-                    }
-                }
-            }
-        });
-
-        new Chart(stockCtx.getContext('2d'), {
-            type: 'doughnut',
-            data: {
-                labels: ['Healthy', 'Low Stock', 'Out of Stock'],
-                datasets: [{
-                    data: <?php echo json_encode($chart_data['stock_status']); ?>,
-                    backgroundColor: ['#15803d', '#f59e0b', '#e11d48'],
-                    borderWidth: 0,
-                }]
-            },
-            options: {
-                maintainAspectRatio: false,
-                responsive: true,
-                plugins: {
-                    legend: { position: 'bottom' }
-                }
-            }
-        });
+    function escapeHtml(value) {
+        return String(value ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
     }
 
     function formatDate(value) {
@@ -925,30 +1226,21 @@ $dashboardInsights['empty_state'] = empty($recent_sales) && empty($top_products)
         return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: '2-digit' });
     }
 
-    function escapeHtml(value) {
-        return String(value ?? '')
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/\"/g, '&quot;')
-            .replace(/'/g, '&#039;');
-    }
-
     function renderOfficeSupplies(rows) {
         suppliesTbody.innerHTML = '';
-        rows.forEach((item) => {
+        rows.forEach(function (item) {
+            const stock = Number(item.stocks || 0);
+            const cost = Number(item.unit_cost || 0);
             const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${escapeHtml(item.id ?? '')}</td>
-                <td>${escapeHtml(item.category_id ?? '')}</td>
-                <td>${escapeHtml(item.item_name ?? 'N/A')}</td>
-                <td>${escapeHtml(item.category ?? 'Uncategorized')}</td>
-                <td>${escapeHtml(item.description ?? '-')}</td>
-                <td class=\"supplies-cost\">$${Number(item.unit_cost || 0).toFixed(2)}</td>
-                <td>${escapeHtml(item.stocks ?? 0)}</td>
-                <td>${escapeHtml(formatDate(item.created_at))}</td>
-                <td>${escapeHtml(formatDate(item.updated_at))}</td>
-            `;
+            tr.innerHTML = ''
+                + '<td>' + escapeHtml(item.id ?? '') + '</td>'
+                + '<td>' + escapeHtml(item.category ?? 'Uncategorized') + '</td>'
+                + '<td>' + escapeHtml(item.item_name ?? 'N/A') + '</td>'
+                + '<td>' + escapeHtml(item.description ?? '-') + '</td>'
+                + '<td>' + money(cost) + '</td>'
+                + '<td>' + escapeHtml(stock) + '</td>'
+                + '<td>' + escapeHtml(formatDate(item.created_at)) + '</td>'
+                + '<td>' + escapeHtml(formatDate(item.updated_at)) + '</td>';
             suppliesTbody.appendChild(tr);
         });
     }
@@ -961,7 +1253,6 @@ $dashboardInsights['empty_state'] = empty($recent_sales) && empty($top_products)
         suppliesLoading.style.display = 'grid';
         suppliesContainer.style.display = 'none';
         suppliesEmpty.style.display = 'none';
-        suppliesCount.textContent = 'Loading...';
 
         try {
             const response = await fetch('app/ajax/office_supplies_data.php', { credentials: 'same-origin' });
@@ -972,9 +1263,21 @@ $dashboardInsights['empty_state'] = empty($recent_sales) && empty($top_products)
             }
 
             const rows = Array.isArray(payload.data) ? payload.data : [];
-            suppliesCount.textContent = `${rows.length} items`;
+            let totalUnits = 0;
+            let totalValue = 0;
+            rows.forEach(function (item) {
+                const stock = Number(item.stocks || 0);
+                const cost = Number(item.unit_cost || 0);
+                totalUnits += stock;
+                totalValue += stock * cost;
+            });
 
-            if (rows.length === 0) {
+            suppliesCount.textContent = rows.length + ' items';
+            if (suppliesItemsEl) suppliesItemsEl.textContent = Number(rows.length).toLocaleString();
+            if (suppliesUnitsEl) suppliesUnitsEl.textContent = Number(totalUnits).toLocaleString();
+            if (suppliesValueEl) suppliesValueEl.textContent = money(totalValue);
+
+            if (!rows.length) {
                 suppliesEmpty.style.display = 'block';
             } else {
                 renderOfficeSupplies(rows);
@@ -983,13 +1286,12 @@ $dashboardInsights['empty_state'] = empty($recent_sales) && empty($top_products)
         } catch (error) {
             suppliesCount.textContent = 'Unavailable';
             suppliesEmpty.style.display = 'block';
-            suppliesEmpty.textContent = `Unable to load office supplies: ${error.message}`;
+            suppliesEmpty.textContent = 'Unable to load office supplies: ' + error.message;
         } finally {
             suppliesLoading.style.display = 'none';
         }
     }
 
     loadOfficeSupplies();
-
 })();
 </script>
