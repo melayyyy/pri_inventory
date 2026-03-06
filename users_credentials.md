@@ -23,4 +23,5 @@ All users have the same password: `password`
 | 17 | Kathryn Frances Ocampo | kathryn.ocampo@company.ph | staff |
 | 18 | Christian Mark Valencia | christian.valencia@company.ph | staff |
 | 19 | Angelique Rae Chua | angelique.chua@company.ph | admin |
-| 20 | Bryan James Tan | bryan.tan@company.ph | staff |
+| 20 | Angelo Gaupo | angelo.gaupo@dotr.gov.ph | staff |
+

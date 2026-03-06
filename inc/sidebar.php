@@ -40,36 +40,6 @@ if ($avatarInitial === '') {
                 </li>
 
                 <li class="nav-header sidebar-section-label" role="presentation">OPERATIONS</li>
-                <li class="nav-item has-treeview <?php echo in_array($actual_link, ['quick_sell', 'sell_list', 'sell_return_list']) ? 'menu-open' : ''; ?>">
-                    <a href="#" title="Sales" class="nav-link <?php echo in_array($actual_link, ['quick_sell', 'sell_list', 'sell_return_list']) ? 'active' : ''; ?>">
-                        <i class="nav-icon fas fa-shopping-cart"></i>
-                        <p>
-                            Sales
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="index.php?page=quick_sell" class="nav-link <?php echo $actual_link == 'quick_sell' ? 'active' : ''; ?>">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>New Sale</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="index.php?page=sell_list" class="nav-link <?php echo $actual_link == 'sell_list' ? 'active' : ''; ?>">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Sales List</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="index.php?page=sell_return_list" class="nav-link <?php echo $actual_link == 'sell_return_list' ? 'active' : ''; ?>">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Returns</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-
                 <li class="nav-item has-treeview <?php echo in_array($actual_link, ['add_expense', 'exspense_list', 'expense_catagory_list']) ? 'menu-open' : ''; ?>">
                     <a href="#" title="Expenses" class="nav-link <?php echo in_array($actual_link, ['add_expense', 'exspense_list', 'expense_catagory_list']) ? 'active' : ''; ?>">
                         <i class="nav-icon fas fa-money-bill-wave"></i>
