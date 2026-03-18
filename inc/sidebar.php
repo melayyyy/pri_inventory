@@ -11,9 +11,9 @@ if ($avatarInitial === '') {
 <aside class="main-sidebar sidebar-dark-primary elevation-4 sidebar-redesign" aria-label="Primary Navigation">
 
     <!-- Brand Logo -->
-    <a href="index.php?page=dashboard" class="brand-link" aria-label="Office Stock Dashboard">
+    <a href="index.php?page=dashboard" class="brand-link" aria-label="PRI Inventory System Dashboard">
         <img src="dist/img/AdminLTELogo.png" alt="Logo" class="brand-image img-circle elevation-3">
-        <span class="brand-text font-weight-semibold">Office Stock</span>
+        <span class="brand-text font-weight-semibold">PRI Inventory System</span>
     </a>
 
     <!-- Sidebar -->

@@ -4,8 +4,8 @@ All users have the same password: `password`
 
 | # | Full Name | Email | Role |
 |---|-----------|-------|------|
-| 1 | Maria Clara Santos | maria.santos@company.ph | admin |
-| 2 | Juan Miguel Reyes | juan.reyes@company.ph | staff |
+| 1 | Camela H. Godilo | melagodilo@dotr.gov.ph | admin |
+| 2 | Anna Katrina P. Flores | anna.flores@dotr.gov.ph | staff |
 | 3 | Ana Lucia Garcia | ana.garcia@company.ph | admin |
 | 4 | Carlos Joseph Mendoza | carlos.mendoza@company.ph | staff |
 | 5 | Sofia Marie Cruz | sofia.cruz@company.ph | staff |
