@@ -666,12 +666,12 @@ $isAnalyticsEmpty = array_sum(array_map('abs', array_values($chart['sales']))) =
         <div class="container-fluid">
 <div class="dashboard-shell">
     <section class="hero-band" aria-labelledby="analyticsHeading">
-        <h1 id="analyticsHeading" class="hero-title">Business Analytics Dashboard</h1>
-        <p class="hero-subtitle">Live insights from sales, purchases, expenses, stock levels, and payment behavior.</p>
+        <h1 id="analyticsHeading" class="hero-title">Office Supplies Inventory System</h1>
+        <p class="hero-subtitle"></p>
         <div class="hero-stats">
             <span class="hero-chip"><i class="far fa-calendar-alt"></i> <?php echo date('F Y'); ?></span>
-            <span class="hero-chip"><i class="fas fa-boxes"></i> <?php echo number_format($kpi['total_products']); ?> products tracked</span>
-            <span class="hero-chip"><i class="fas fa-exclamation-triangle"></i> <?php echo number_format($kpi['low_stock_count']); ?> low stock alerts</span>
+
+           
         </div>
     </section>
 
@@ -686,25 +686,27 @@ $isAnalyticsEmpty = array_sum(array_map('abs', array_values($chart['sales']))) =
         <div class="col-12 col-sm-6 col-xl-3">
             <article class="card metric-card">
                 <div class="card-body">
-                    <div class="metric-label">Sales (<?php echo htmlspecialchars($focusMonthLabel, ENT_QUOTES, 'UTF-8'); ?>)</div>
+                    <div class="metric-label">Low Stock Alerts (<?php echo htmlspecialchars($focusMonthLabel, ENT_QUOTES, 'UTF-8'); ?>)</div>
                     <p class="metric-value">$<?php echo number_format($kpi['sales_month'], 2); ?></p>
-                    <span class="metric-note"><span class="badge-analytics badge-primary-soft">Revenue</span></span>
+                    <span class="metric-note"><span class="badge-analytics badge-primary-soft">
+
+                    </span></span>
                 </div>
             </article>
         </div>
         <div class="col-12 col-sm-6 col-xl-3">
             <article class="card metric-card">
                 <div class="card-body">
-                    <div class="metric-label">Purchases (<?php echo htmlspecialchars($focusMonthLabel, ENT_QUOTES, 'UTF-8'); ?>)</div>
+                    <div class="metric-label">Stock Availability (<?php echo htmlspecialchars($focusMonthLabel, ENT_QUOTES, 'UTF-8'); ?>)</div>
                     <p class="metric-value">$<?php echo number_format($kpi['purchase_month'], 2); ?></p>
-                    <span class="metric-note"><span class="badge-analytics badge-warning-soft">Cost of Stock</span></span>
+                    <span class="metric-note"><span class="badge-analytics badge-warning-soft"></span></span>
                 </div>
             </article>
         </div>
         <div class="col-12 col-sm-6 col-xl-3">
             <article class="card metric-card">
                 <div class="card-body">
-                    <div class="metric-label">Operating Expense (<?php echo htmlspecialchars($focusMonthLabel, ENT_QUOTES, 'UTF-8'); ?>)</div>
+                    <div class="metric-label">INVENTORY VALUE(<?php echo htmlspecialchars($focusMonthLabel, ENT_QUOTES, 'UTF-8'); ?>)</div>
                     <p class="metric-value">$<?php echo number_format($kpi['expense_month'], 2); ?></p>
                     <span class="metric-note"><span class="badge-analytics badge-warning-soft">This Month</span></span>
                 </div>
@@ -713,7 +715,7 @@ $isAnalyticsEmpty = array_sum(array_map('abs', array_values($chart['sales']))) =
         <div class="col-12 col-sm-6 col-xl-3">
             <article class="card metric-card">
                 <div class="card-body">
-                    <div class="metric-label">Estimated Net (<?php echo htmlspecialchars($focusMonthLabel, ENT_QUOTES, 'UTF-8'); ?>)</div>
+                    <div class="metric-label">STOCK STATUS (<?php echo htmlspecialchars($focusMonthLabel, ENT_QUOTES, 'UTF-8'); ?>)</div>
                     <p class="metric-value">$<?php echo number_format($kpi['profit_month'], 2); ?></p>
                     <span class="metric-note">
                         <span class="badge-analytics <?php echo $kpi['profit_month'] >= 0 ? 'badge-success-soft' : 'badge-warning-soft'; ?>">
@@ -726,9 +728,9 @@ $isAnalyticsEmpty = array_sum(array_map('abs', array_values($chart['sales']))) =
         <div class="col-12 col-sm-6 col-xl-3">
             <article class="card metric-card">
                 <div class="card-body">
-                    <div class="metric-label">Collection Rate (<?php echo htmlspecialchars($focusMonthLabel, ENT_QUOTES, 'UTF-8'); ?>)</div>
+                    <div class="metric-label">REPLENISHMENT RATE(<?php echo htmlspecialchars($focusMonthLabel, ENT_QUOTES, 'UTF-8'); ?>)</div>
                     <p class="metric-value"><?php echo number_format($kpi['collection_rate_month'], 1); ?>%</p>
-                    <span class="metric-note">Based on paid vs billed sales</span>
+                    <span class="metric-note"></span>
                 </div>
             </article>
         </div>
@@ -737,25 +739,25 @@ $isAnalyticsEmpty = array_sum(array_map('abs', array_values($chart['sales']))) =
                 <div class="card-body">
                     <div class="metric-label">Inventory Health</div>
                     <p class="metric-value"><?php echo number_format($kpi['inventory_health'], 1); ?>%</p>
-                    <span class="metric-note">Healthy vs low stock ratio</span>
+                    <span class="metric-note"></span>
                 </div>
             </article>
         </div>
         <div class="col-12 col-sm-6 col-xl-3">
             <article class="card metric-card">
                 <div class="card-body">
-                    <div class="metric-label">Sales Due (Total)</div>
+                    <div class="metric-label">TOTAL ISSUANCES</div>
                     <p class="metric-value">$<?php echo number_format($kpi['sales_due_total'], 2); ?></p>
-                    <span class="metric-note">Outstanding customer balance</span>
+                    <span class="metric-note"></span>
                 </div>
             </article>
         </div>
         <div class="col-12 col-sm-6 col-xl-3">
             <article class="card metric-card">
                 <div class="card-body">
-                    <div class="metric-label">Purchase Due (Total)</div>
+                    <div class="metric-label">PROCUREMENT</div>
                     <p class="metric-value">$<?php echo number_format($kpi['purchase_due_total'], 2); ?></p>
-                    <span class="metric-note">Outstanding supplier balance</span>
+                    <span class="metric-note"></span>
                 </div>
             </article>
         </div>
@@ -772,10 +774,10 @@ $isAnalyticsEmpty = array_sum(array_map('abs', array_values($chart['sales']))) =
             <section class="card chart-card" aria-labelledby="trendAnalyticsHeading">
                 <div class="card-header d-flex justify-content-between align-items-center" style="gap: 8px;">
                     <div>
-                        <h2 id="trendAnalyticsHeading" class="chart-title">6-Month Revenue, Purchase, and Expense Trend</h2>
-                        <p class="chart-subtitle">Compare business inflow and outflow month by month.</p>
+                        <h2 id="trendAnalyticsHeading" class="chart-title"> </h2>
+                        <p class="chart-subtitle"></p>
                     </div>
-                    <span class="badge-analytics badge-primary-soft">Last 6 Months</span>
+                    <span class="badge-analytics badge-primary-soft"></span>
                 </div>
                 <div class="card-body">
                     <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
@@ -785,8 +787,8 @@ $isAnalyticsEmpty = array_sum(array_map('abs', array_values($chart['sales']))) =
         <div class="col-lg-4">
             <section class="card chart-card" aria-labelledby="stockDistributionHeading">
                 <div class="card-header">
-                    <h2 id="stockDistributionHeading" class="chart-title">Stock Distribution</h2>
-                    <p class="chart-subtitle">Healthy, low, and out-of-stock products.</p>
+                    <h2 id="stockDistributionHeading" class="chart-title"></h2>
+                    <p class="chart-subtitle"></p>
                 </div>
                 <div class="card-body">
                     <div class="chart-wrap compact"><canvas id="stockChart"></canvas></div>
@@ -799,8 +801,8 @@ $isAnalyticsEmpty = array_sum(array_map('abs', array_values($chart['sales']))) =
         <div class="col-lg-6">
             <section class="card chart-card" aria-labelledby="productRankHeading">
                 <div class="card-header">
-                    <h2 id="productRankHeading" class="chart-title">Top Products by Units Sold</h2>
-                    <p class="chart-subtitle">From invoice line-item quantity.</p>
+                    <h2 id="productRankHeading" class="chart-title"></h2>
+                    <p class="chart-subtitle"></p>
                 </div>
                 <div class="card-body">
                     <div class="chart-wrap compact"><canvas id="topProductsChart"></canvas></div>
@@ -810,8 +812,8 @@ $isAnalyticsEmpty = array_sum(array_map('abs', array_values($chart['sales']))) =
         <div class="col-lg-3">
             <section class="card chart-card" aria-labelledby="paymentMixHeading">
                 <div class="card-header">
-                    <h2 id="paymentMixHeading" class="chart-title">Payment Mix</h2>
-                    <p class="chart-subtitle">Current month sales split.</p>
+                    <h2 id="paymentMixHeading" class="chart-title"></h2>
+                    <p class="chart-subtitle"></p>
                 </div>
                 <div class="card-body">
                     <div class="chart-wrap compact"><canvas id="paymentChart"></canvas></div>
@@ -821,8 +823,8 @@ $isAnalyticsEmpty = array_sum(array_map('abs', array_values($chart['sales']))) =
         <div class="col-lg-3">
             <section class="card chart-card" aria-labelledby="categoryMixHeading">
                 <div class="card-header">
-                    <h2 id="categoryMixHeading" class="chart-title">Category Demand</h2>
-                    <p class="chart-subtitle">Units sold by category.</p>
+                    <h2 id="categoryMixHeading" class="chart-title"></h2>
+                    <p class="chart-subtitle"></p>
                 </div>
                 <div class="card-body">
                     <div class="chart-wrap compact"><canvas id="categoryChart"></canvas></div>
@@ -835,25 +837,25 @@ $isAnalyticsEmpty = array_sum(array_map('abs', array_values($chart['sales']))) =
         <div class="col-lg-8">
             <section class="card data-card" aria-labelledby="recentSalesHeading">
                 <div class="card-header d-flex justify-content-between align-items-center" style="gap: 8px;">
-                    <h2 id="recentSalesHeading" class="chart-title">Recent Sales</h2>
+                    <h2 id="recentSalesHeading" class="chart-title">Recent Supply Issuances</h2>
                     <a href="index.php?page=sell_list" class="btn btn-sm btn-outline-primary">View All</a>
                 </div>
                 <div class="card-body p-0" style="overflow-x: auto;">
                     <table class="analytics-table">
                         <thead>
                             <tr>
-                                <th>Invoice #</th>
-                                <th>Customer</th>
                                 <th>Date</th>
-                                <th>Total</th>
-                                <th>Payment Type</th>
-                                <th>Status</th>
+                                <th>Division</th>
+                                <th>Item</th>
+                                <th>Quantity</th>
+            
+                            <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if (empty($recentSales)): ?>
                                 <tr>
-                                    <td colspan="6"><div class="empty-state m-2">No recent sales available.</div></td>
+                                    <td colspan="6"><div class="empty-state m-2">No supply issuances recorded for this period.</div></td>
                                 </tr>
                             <?php else: ?>
                                 <?php foreach ($recentSales as $sale): ?>
@@ -907,7 +909,7 @@ $isAnalyticsEmpty = array_sum(array_map('abs', array_values($chart['sales']))) =
         <div class="col-12">
             <section class="card data-card" aria-labelledby="officeSuppliesHeading">
                 <div class="card-header d-flex justify-content-between align-items-center" style="gap: 10px;">
-                    <h2 id="officeSuppliesHeading" class="chart-title">Office Supplies Snapshot</h2>
+                    <h2 id="officeSuppliesHeading" class="chart-title">Office Supplies </h2>
                     <span class="badge-analytics badge-primary-soft" id="officeSuppliesCount">
                         <?php echo number_format($officeSuppliesSummary['total_items']); ?> items
                     </span>

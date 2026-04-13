@@ -44,7 +44,7 @@ if ($avatarInitial === '') {
                     <a href="#" title="Expenses" class="nav-link <?php echo in_array($actual_link, ['add_expense', 'exspense_list', 'expense_catagory_list']) ? 'active' : ''; ?>">
                         <i class="nav-icon fas fa-money-bill-wave"></i>
                         <p>
-                            Expenses
+                           Supply Issuances
                             <i class="right fas fa-angle-left"></i>
                         </p>
                     </a>
@@ -52,19 +52,19 @@ if ($avatarInitial === '') {
                         <li class="nav-item">
                             <a href="index.php?page=add_expense" class="nav-link <?php echo $actual_link == 'add_expense' ? 'active' : ''; ?>">
                                 <i class="far fa-circle nav-icon"></i>
-                                <p>New Expense</p>
+                                <p>New Issuance</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="index.php?page=exspense_list" class="nav-link <?php echo $actual_link == 'exspense_list' ? 'active' : ''; ?>">
                                 <i class="far fa-circle nav-icon"></i>
-                                <p>Expense List</p>
+                                <p>Issuance History</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="index.php?page=expense_catagory_list" class="nav-link <?php echo $actual_link == 'expense_catagory_list' ? 'active' : ''; ?>">
                                 <i class="far fa-circle nav-icon"></i>
-                                <p>Expense Categories</p>
+                                <p>Purpose / Type</p>
                             </a>
                         </li>
                     </ul>
@@ -74,7 +74,7 @@ if ($avatarInitial === '') {
                     <a href="#" title="Purchases" class="nav-link <?php echo in_array($actual_link, ['buy_product', 'buy_list', 'buy_refund_list']) ? 'active' : ''; ?>">
                         <i class="nav-icon fas fa-truck"></i>
                         <p>
-                            Purchases
+                           Supply Procurement
                             <i class="right fas fa-angle-left"></i>
                         </p>
                     </a>
@@ -82,19 +82,19 @@ if ($avatarInitial === '') {
                         <li class="nav-item">
                             <a href="index.php?page=buy_product" class="nav-link <?php echo $actual_link == 'buy_product' ? 'active' : ''; ?>">
                                 <i class="far fa-circle nav-icon"></i>
-                                <p>New Purchase</p>
+                                <p>New Delivery</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="index.php?page=buy_list" class="nav-link <?php echo $actual_link == 'buy_list' ? 'active' : ''; ?>">
                                 <i class="far fa-circle nav-icon"></i>
-                                <p>Purchase List</p>
+                                <p>Delivery History</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="index.php?page=buy_refund_list" class="nav-link <?php echo $actual_link == 'buy_refund_list' ? 'active' : ''; ?>">
                                 <i class="far fa-circle nav-icon"></i>
-                                <p>Purchase Returns</p>
+                                <p>Return to Supplier</p>
                             </a>
                         </li>
                     </ul>
@@ -104,7 +104,7 @@ if ($avatarInitial === '') {
                     <a href="#" title="Staff" class="nav-link <?php echo in_array($actual_link, ['add_stuff', 'staff_list']) ? 'active' : ''; ?>">
                         <i class="nav-icon fas fa-users"></i>
                         <p>
-                            Staff
+                          Divisions
                             <i class="right fas fa-angle-left"></i>
                         </p>
                     </a>
@@ -112,13 +112,13 @@ if ($avatarInitial === '') {
                         <li class="nav-item">
                             <a href="index.php?page=add_stuff" class="nav-link <?php echo $actual_link == 'add_stuff' ? 'active' : ''; ?>">
                                 <i class="far fa-circle nav-icon"></i>
-                                <p>Add Staff</p>
+                                <p>Add Division</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="index.php?page=staff_list" class="nav-link <?php echo $actual_link == 'staff_list' ? 'active' : ''; ?>">
                                 <i class="far fa-circle nav-icon"></i>
-                                <p>Staff List</p>
+                                <p>Directory of Offices</p>
                             </a>
                         </li>
                     </ul>
@@ -137,31 +137,31 @@ if ($avatarInitial === '') {
                         <li class="nav-item">
                             <a href="index.php?page=member" class="nav-link <?php echo $actual_link == 'member' ? 'active' : ''; ?>">
                                 <i class="far fa-circle nav-icon"></i>
-                                <p>Customers</p>
+                                <p>Office Directory</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="index.php?page=suppliar" class="nav-link <?php echo $actual_link == 'suppliar' ? 'active' : ''; ?>">
                                 <i class="far fa-circle nav-icon"></i>
-                                <p>Suppliers</p>
+                                <p>Supplier Registry</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="index.php?page=customers_report" class="nav-link <?php echo $actual_link == 'customers_report' ? 'active' : ''; ?>">
                                 <i class="far fa-circle nav-icon"></i>
-                                <p>Customer Balance</p>
+                                <p>Division Requests</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="index.php?page=suppliar_report" class="nav-link <?php echo $actual_link == 'suppliar_report' ? 'active' : ''; ?>">
                                 <i class="far fa-circle nav-icon"></i>
-                                <p>Supplier Balance</p>
+                                <p>Procurement Status</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="index.php?page=sms" class="nav-link <?php echo $actual_link == 'sms' ? 'active' : ''; ?>">
                                 <i class="far fa-circle nav-icon"></i>
-                                <p>SMS</p>
+                                <p>Notifications</p>
                             </a>
                         </li>
                     </ul>
@@ -180,37 +180,37 @@ if ($avatarInitial === '') {
                         <li class="nav-item">
                             <a href="index.php?page=profit_loss" class="nav-link <?php echo $actual_link == 'profit_loss' ? 'active' : ''; ?>">
                                 <i class="far fa-circle nav-icon"></i>
-                                <p>Profit/Loss</p>
+                                <p>Inventory Valuation</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="index.php?page=sales_report" class="nav-link <?php echo $actual_link == 'sales_report' ? 'active' : ''; ?>">
                                 <i class="far fa-circle nav-icon"></i>
-                                <p>Sales Report</p>
+                                <p>Issuance Report</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="index.php?page=purchase_report" class="nav-link <?php echo $actual_link == 'purchase_report' ? 'active' : ''; ?>">
                                 <i class="far fa-circle nav-icon"></i>
-                                <p>Purchase Report</p>
+                                <p>Procurement Report</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="index.php?page=sell_pay_report" class="nav-link <?php echo $actual_link == 'sell_pay_report' ? 'active' : ''; ?>">
                                 <i class="far fa-circle nav-icon"></i>
-                                <p>Sales Payments</p>
+                                <p>Stock In/Out Log</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="index.php?page=purchase_pay_report" class="nav-link <?php echo $actual_link == 'purchase_pay_report' ? 'active' : ''; ?>">
                                 <i class="far fa-circle nav-icon"></i>
-                                <p>Purchase Payments</p>
+                                <p>Division Summary</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="index.php?page=total_report" class="nav-link <?php echo $actual_link == 'total_report' ? 'active' : ''; ?>">
                                 <i class="far fa-circle nav-icon"></i>
-                                <p>Total Report</p>
+                                <p>Inventory Summary</p>
                             </a>
                         </li>
                     </ul>
@@ -220,7 +220,7 @@ if ($avatarInitial === '') {
                 <li class="nav-item">
                      <a href="index.php?page=backup_database" title="Backup Database" class="nav-link <?php echo $actual_link == 'backup_database' ? 'active' : ''; ?>" <?php echo $actual_link == 'backup_database' ? 'aria-current="page"' : ''; ?>>
                         <i class="nav-icon fas fa-database"></i>
-                        <p>Backup Database</p>
+                        <p>Digital Archive</p>
                     </a>
                 </li>
             </ul>

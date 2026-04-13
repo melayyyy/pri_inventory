@@ -126,8 +126,9 @@ class User extends Objects {
             'table' => $this->getAuthTableName()
         ]);
 
-        redirect('index.php?page=dashboard');
-        return true;
+        // Standard Redirect to Dashboard
+        header("location: ../../index.php?page=dashboard");
+        exit;
     }
 
     private function setLoginFailure($reason, $debugMessage, $identifier, array $extra = []) {
@@ -141,7 +142,9 @@ class User extends Objects {
         ]);
         $this->logLoginEvent('LOGIN_FAILED', $context);
 
-        redirect('login.php');
+        // Standard Redirect to Login
+        header("location: ../../login.php");
+        exit;
     }
 
     private function getAuthTableName() {
@@ -407,7 +410,8 @@ class User extends Objects {
         if ($this->is_admin()) {
             return true;
         } else {
-            redirect($page);
+            header("location: ../../" . $page);
+            exit;
         }
     }
 
@@ -423,7 +427,8 @@ class User extends Objects {
         if (session_status() === PHP_SESSION_ACTIVE) {
             session_destroy();
         }
-        redirect('login.php');
+        header("location: ../../login.php");
+        exit;
     }
 
     public function checkUser($username) {

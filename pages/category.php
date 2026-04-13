@@ -192,12 +192,12 @@
       </style>
 
       <div class="cat-hero">
-        <h2 class="cat-hero-title">Modern Category Workspace</h2>
-        <p class="cat-hero-sub">Fast search, cleaner table layout, and smooth skeleton loading while data is fetched.</p>
+        <h2 class="cat-hero-title">Inventory Categories</h2>
+        <p class="cat-hero-sub">Organize and manage supply groups for easier stock tracking and reporting.</p>
         <div class="cat-toolbar">
           <div class="cat-search">
             <i class="fas fa-search" aria-hidden="true"></i>
-            <input id="categoryQuickSearch" type="search" placeholder="Search category by name or ID..." aria-label="Search category">
+            <input id="categoryQuickSearch" type="search" placeholder="Search supply category..." aria-label="Search category">
           </div>
           <span class="cat-kpi" id="categoryTotalCount"><i class="fas fa-layer-group"></i> Loading categories...</span>
           <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target=".catagoryModal">

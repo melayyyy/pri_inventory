@@ -5,9 +5,9 @@
             <div class="container-fluid mt-5">
               <div class="card  mt-5">
              <div class="card-header">
-                <h3 class="card-title"><b>Buy Product</b></h3>
+                <h3 class="card-title"><b>New Supply Procurement</b></h3>
 
-                 <button type="button" class="btn btn-primary btn-sm float-right rounded-0" data-toggle="modal" data-target=".suppliarModal"><i class="fas fa-plus"></i> Add new</button>
+                 <button type="button" class="btn btn-primary btn-sm float-right rounded-0" data-toggle="modal" data-target=".suppliarModal"><i class="fas fa-plus"></i>New Procurement</button>
               </div>
               <!-- /.card-header -->
                
@@ -17,9 +17,9 @@
                    <div class="row">
                     <div class="col-md-6">
                        <div class="form-group">
-                      <label for="p_supliar">Supplier Name *</label>
+                      <label for="p_supliar">Supplier*</label>
                       <select name="p_supliar" id="p_supliar" class="form-control  select2">
-                        <option selected disabled>Select a Supplier </option>
+                        <option selected disabled> </option>
                         <?php 
                           $all_supplier = $obj->all('suppliar');
                           foreach ($all_supplier as $supplier) {
@@ -45,9 +45,9 @@
                     <div class="row">
                       <div class="col-md-6">
                         <div class="form-group">
-                      <label for="p_product_name">purchas product *</label>
+                      <label for="p_product_name">Select Supply *</label>
                       <select name="p_product_name" id="p_product_name" class="form-control form-control-sm select2">
-                        <option selected disabled>Select a product </option>
+                        <option selected disabled></option>
                         <?php 
                           $all_product = $obj->all('products');
                           foreach ($all_product as $product) {
@@ -61,7 +61,7 @@
                       </div>
 
                       <div class="col-md-6">
-                        <a href="index.php?page=add_product" target="_blank" class="btn btn-success rounded-0" style="margin-top: 30px;">Add new prodcut</a>
+                        <a href="index.php?page=add_product" target="_blank" class="btn btn-success rounded-0" style="margin-top: 30px;">Add New Item</a>
                       </div>
                     </div>
                     
@@ -69,26 +69,26 @@
                     <div class="cl-md-3 col-lg-3">
                        <div class="form-group">
                       <label for="p_p_quantity">Stock Quantity *</label>
-                      <input type="number" class="form-control" id="p_p_quantity" name="p_p_quantity" placeholder="stock quantity" readonly>
+                      <input type="number" class="form-control" id="p_p_quantity" name="p_p_quantity" placeholder="" readonly>
                       </div>
                       </div>
                         <div class="cl-md-3 col-lg-3">
                       <div class="form-group">
-                      <label for="p_p_price">Buy price *</label>
-                      <input type="number" class="form-control" id="p_p_price" name="p_p_price" placeholder="Purchase price">
+                      <label for="p_p_price">Unit Cost (₱) *</label>
+                      <input type="number" class="form-control" id="p_p_price" name="p_p_price" placeholder="">
                       </div>
                       </div>
                        <div class="cl-md-3 col-lg-3">
                        <div class="form-group">
-                      <label for="p_pn_quantity">Purchase quantity *</label>
-                      <input type="number" class="form-control" id="p_pn_quantity" name="p_pn_quantity" placeholder="Purchase quantity">
+                      <label for="p_pn_quantity">Procured Quantity *</label>
+                      <input type="number" class="form-control" id="p_pn_quantity" name="p_pn_quantity" placeholder="">
                       </div>
                       </div>
                   
                     <div class="cl-md-3 col-lg-3">
                       <div class="form-group">
-                      <label for="p_p_sell_price">Sell price *</label>
-                      <input type="number" class="form-control" id="p_p_sell_price" name="p_p_sell_price" placeholder="Sell price">
+                      <label for="p_p_sell_price">Estimated Value *</label>
+                      <input type="number" class="form-control" id="p_p_sell_price" name="p_p_sell_price" placeholder="">
                       </div>
                       </div>
                     </div>
@@ -101,7 +101,7 @@
                       <div class="form-group">
                         <div class="row">
                           <div class="col-md-3">
-                            <label for="p_subtotal">Subtoal</label>
+                            <label for="p_subtotal">Subtotal</label>
                           </div> 
                           <div class="col-md-8">
                             <input type="number" class="form-control form-control-sm" name="p_subtotal" id="p_subtotal"></div>  
@@ -126,7 +126,7 @@
                       <div class="form-group">
                        <div class="row">
                          <div class="col-md-3">
-                           <label for="supliar_prev_total_due">previous Total due</label>
+                           <label for="supliar_prev_total_due">Outstanding Balance</label>
                          </div>
                          <div class="col-md-8">
                           <input type="number" readonly class="form-control form-control-sm" name="supliar_prev_total_due" id="supliar_prev_total_due">
@@ -136,7 +136,7 @@
                       <div class="form-group">
                        <div class="row">
                          <div class="col-md-3">
-                           <label for="p_netTotal">Net Total</label>
+                           <label for="p_netTotal">Total Amount Payable</label>
                          </div>
                          <div class="col-md-8">
                           <input type="number" readonly class="form-control form-control-sm" name="p_netTotal" id="p_netTotal">
@@ -146,7 +146,7 @@
                       <div class="form-group">
                         <div class="row">
                           <div class="col-md-3">
-                            <label for="p_paidBill">Paid bill</label>
+                            <label for="p_paidBill">Amount Paid</label>
                           </div>
                           <div class="col-md-8">
                          <input type="number" class="form-control form-control-sm" name="p_paidBill" id="p_paidBill">
@@ -156,7 +156,7 @@
                       <div class="form-group">
                        <div class="row">
                          <div class="col-md-3">
-                           <label for="p_dueBill">Due bill</label>
+                           <label for="p_dueBill">Remaining Balance</label>
                          </div>
                          <div class="col-md-8">
                            <input type="number" readonly class="form-control form-control-sm" name="p_dueBill" id="p_dueBill">
@@ -167,11 +167,11 @@
                       <div class="form-group">
                        <div class="row">
                          <div class="col-md-3">
-                           <label for="p_payMethode">Payment Methode</label>
+                           <label for="p_payMethode">Mode of Payment</label>
                          </div>
                          <div class="col-md-8">
                             <select name="p_payMethode" id="p_payMethode" class="form-control form-control-sm select2">
-                             <option selected disabled>Select a payment methode</option>
+                             <option selected disabled></option>
                              <?php 
 
                         $all_methode = $obj->all('paymethode');
@@ -189,7 +189,7 @@
                        </div>
                      </div>
                       <div class="form-group">
-                         <button type="submit" class="btn btn-primary btn-block mt-4 rounded-0" id="addByproductBtn">Purchase product </button>
+                         <button type="submit" class="btn btn-primary btn-block mt-4 rounded-0" id="addByproductBtn">Save Delivery Record </button>
                       </div>
                       </div>
                   </div>

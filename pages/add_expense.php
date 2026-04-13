@@ -9,16 +9,16 @@
                  <div class="col-md-8 offset-md-2 col-lg-8 offset-lg-2 mt-3">
                    <div class="card">
                     <div class="card-header">
-                <h3 class="card-title"><b>Add catagory</b></h3>
-                <button type="button" class="btn btn-primary btn-sm float-right rounded-0" data-toggle="modal" data-target=".expenseCatModal" ><i class="fas fa-plus"></i> expense catagory</button>
-              </div>
+                <h3 class="card-title"><b>Log New Issuance</b></h3>
+                <button type="button" class="btn btn-primary btn-sm float-right rounded-0" data-toggle="modal" data-target=".expenseCatModal" ><i class="fas fa-plus"></i> + Add Issuance Type</button>
+              </div> 
                      <div class="card-body">
                 <form id="addExpenseForm">
 
                   <div class="row">
                        <div class="col-md-6 ">
                     <div class="form-group">
-                        <label for="expense_date">Expene date</label>
+                        <label for="expense_date">Issuance Date</label>
                     <div class="input-group flex-nowrap">
                       <div class="input-group-prepend">
                         <span class="input-group-text" id="addon-wrapping"><i class="fas fa-calendar-week"></i></span>
@@ -30,8 +30,8 @@
 
                     <div class="col-md-6 ">
                     <div class="form-group">
-                      <label for="expense_for">Expense for *</label>
-                      <input type="text" class="form-control" id="expense_for" name="expense_for" placeholder="Expense for">
+                      <label for="expense_for">Requesting Division</label>
+                      <input type="text" class="form-control" id="" name="" placeholder="">
                     </div>
                 </div>
               </div>
@@ -40,7 +40,7 @@
                       <div class="col-md-6">
                     <div class="form-group">
                      
-                         <label for="expense_catagory">Expense catagory</label>
+                         <label for="expense_catagory">Item Category</label>
                       <select name="expense_catagory" id="expense_catagory" class="form-control select2">
                         <?php 
                           $all_ex_cat = $obj->all('expense_catagory');
@@ -56,8 +56,8 @@
 
                   <div class="col-md-6">
                     <div class="form-group">
-                      <label for="expense_amount">Expense amount *</label>
-                      <input type="number" class="form-control" id="expense_amount" name="expense_amount" placeholder="Expense amount">
+                      <label for="expense_amount">Quantity Issued</label>
+                      <input type="number" class="form-control" id="" name="" placeholder="">
                     </div>
                   </div>
 

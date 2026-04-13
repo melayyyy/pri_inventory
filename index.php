@@ -1,3 +1,8 @@
+<?php
+  error_reporting(0); // Ito ang magtatanggal ng lahat ng "sulat-sulat" sa taas
+  include_once 'connectdb.php';
+?>
+
 <?php require_once 'inc/header.php'; ?>
 <?php require_once 'inc/sidebar.php'; ?>
 

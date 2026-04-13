@@ -4,24 +4,13 @@ All users have the same password: `password`
 
 | # | Full Name | Email | Role |
 |---|-----------|-------|------|
-| 1 | Camela H. Godilo | melagodilo@dotr.gov.ph | admin |
-| 2 | Anna Katrina P. Flores | anna.flores@dotr.gov.ph | staff |
-| 3 | Ana Lucia Garcia | ana.garcia@company.ph | admin |
-| 4 | Carlos Joseph Mendoza | carlos.mendoza@company.ph | staff |
-| 5 | Sofia Marie Cruz | sofia.cruz@company.ph | staff |
-| 6 | Luis Fernando Torres | luis.torres@company.ph | staff |
-| 7 | Carmen Rosa Bautista | carmen.bautista@company.ph | admin |
-| 8 | Rafael Angelo Navarro | rafael.navarro@company.ph | staff |
-| 9 | Teresa May Flores | teresa.flores@company.ph | staff |
-| 10 | Antonio Paolo Sanchez | antonio.sanchez@company.ph | staff |
-| 11 | Patricia Anne Dimaguiba | patricia.dimaguiba@company.ph | admin |
-| 12 | Emmanuel James Rivera | emmanuel.rivera@company.ph | staff |
-| 13 | Jennifer Clare Lopez | jennifer.lopez@company.ph | staff |
-| 14 | Michael David Kim | michael.kim@company.ph | staff |
-| 15 | Grace Michelle Co | grace.co@company.ph | admin |
-| 16 | Nathaniel Paul Sy | nathaniel.sy@company.ph | staff |
-| 17 | Kathryn Frances Ocampo | kathryn.ocampo@company.ph | staff |
-| 18 | Christian Mark Valencia | christian.valencia@company.ph | staff |
-| 19 | Angelique Rae Chua | angelique.chua@company.ph | admin |
-| 20 | Angelo Gaupo | angelo.gaupo@dotr.gov.ph | staff |
+| 1 | Juan A. Jalober | juan.jalober@dotr.gov.ph | AFS |
+| 2 | Anna Katrina P. Flores | anna.flores@dotr.gov.ph | AFS |
+| 3 | Larrizze Mae C. Isidro| larrizemae.isidro@dotr.gov.ph | AFS |
+| 4 | Edison S. Villamayor | edison.villamayor@dotr.gov.ph | CAD|
+| 5 | Mariol Miguel R. Bactad | mariolmiguel.bactad@dotr.gov.ph | RDD |
+| 6 | Jerold James B. Cruz | jeroldjames.cruz@dotr.gov.ph | AFS |
+| 7 | Agustin B. Soriano Jr.| agustin.soriano@dotr.gov.ph | ROS |
+| 8 | James Kebi Ledesma | jameskebi.ledesma@dotr.gov.ph | SSS |
+| 9 | Francis Bien M. Gonzales| francisbien.gonzales@dotr.gov.ph| RSEFS |
 

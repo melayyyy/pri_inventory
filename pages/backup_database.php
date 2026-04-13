@@ -1,147 +1,109 @@
 <?php 
+// 1. Gumawa ka muna ng folder na "uploads" sa loob ng iyong project folder para dito pumasok ang mga PDF.
+$upload_dir = 'uploads/';
+if (!is_dir($upload_dir)) {
+    mkdir($upload_dir, 0777, true);
+}
 
-  $get_all_table_query = "SHOW TABLES";
-  $stmt = $pdo->prepare($get_all_table_query);
-  $stmt->execute();
-  $res = $stmt->fetchAll();
-if (isset($_POST['submit'])) {
-  if (isset($_POST['table'])) {
-    $output = '';
+if (isset($_POST['upload_pdf'])) {
+    $doc_name = $_POST['doc_name'];
+    $file = $_FILES['pdf_file'];
 
-    foreach ($_POST['table'] as $table) {
-      $show_table_query = "SHOW CREATE TABLE".$table . "";
-      $stmt = $pdo->prepare($show_table_query);
-      $stmt->execute();
-      $show_table_res = $stmt->fetchAll();
+    if ($file['type'] == 'application/pdf') {
+        $file_name = time() . '_' . basename($file['name']); // Nilagyan ng time para walang kaparehong filename
+        $target_path = $upload_dir . $file_name;
 
-      foreach ($show_table_res as $show_table_row) {
-        $output .= "\n\n".$show_table_row["Create Table"]. "; \n\n";
-      }
-
-      $select_query = "SELECT * FROM ".$table."";
-      $stmt = $pdo->prepare($select_query);
-      $stmt->execute();
-      $total_row = $stmt->rowCount();
-
-      for ($count=0; $count < $total_row ; $count++) { 
-        $single_res = $stmt->fetch(PDO::FETCH_ASSOC);
-        $table_column_array = array_keys($single_res);
-        $table_value_array = array_values($single_res);
-        $output .= "\nINSERT INTO $table(";
-        $output .= "" . implode(", ", $table_column_array) . ")
-                  VALUES ( ";
-        $output .= "'" . implode("' ,'" , $table_value_array) . " ');
-                  \n";
-
-
-      }
+        if (move_uploaded_file($file['tmp_name'], $target_path)) {
+            // Dito mo i-save sa database table mo (halimbawa 'digital_archives') ang $doc_name at $file_name
+            // $query = "INSERT INTO digital_archives (doc_name, file_path, date_uploaded) VALUES (?, ?, NOW())";
+            $success = "Document '$doc_name' has been archived successfully.";
+        } else {
+            $error = "Failed to upload file.";
+        }
+    } else {
+        $error = "Please upload PDF files only.";
     }
-    $file_name = 'batabase_backup_on_' . date('Y-m-d').'.sql';
-    $file_handle = fopen($file_name, 'w+');
-    fwrite($file_handle, $output);
-    fclose($file_handle);
-  
+}
+?>
 
-   // Download the SQL backup file to the browser
-        header('Content-Description: File Transfer');
-        header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment; filename=' . basename($file_name));
-        header('Content-Transfer-Encoding: binary');
-        header('Expires: 0');
-        header('Cache-Control: must-revalidate');
-        header('Pragma: public');
-        header('Content-Length: ' . filesize($file_name));
-        ob_clean();
-        flush();
-        readfile($file_name);
-        exec('rm ' . $file_name); 
-
-
-  }else{
-     $selectError = "Please select atleast 1 table name to export";
-  }
-  }
- ?>
-
- <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
-  // <!-- Content Header (Page header) -->
   <div class="content-header">
     <div class="container-fluid mt-3">
       <div class="row">
         <div class="col-md-6">
-          <h1 class="m-0 text-dark">Setting</h1>
-          </div><!-- /.col -->
-          <div class="col-md-6 mt-3">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">Database backup</li>
-            </ol>
-            </div><!-- /.col -->
-            </div><!-- /.row -->
-            </div><!-- /.container-fluid -->
+          <h1 class="m-0 text-dark">Digital Document Archive</h1>
+        </div>
+        <div class="col-md-6 mt-3">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="index.php?page=dashboard">Home</a></li>
+            <li class="breadcrumb-item active">Digital Archive</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="content">
+    <div class="container-fluid">
+        <div class="card shadow mb-4">
+          <div class="card-header bg-primary">
+            <h3 class="card-title text-white">Upload Scanned Document</h3>
           </div>
-          <!-- /.content-header -->
-          <!-- Main content -->
-          <section class="content">
-            <div class="container-fluid">
-                <div class="card">
-                  <div class="card-header">
-                    <h3 class="card-title">Take a database backup</h3>
+          <div class="card-body">
+            <?php 
+                if (isset($success)) echo "<div class='alert alert-success'>$success</div>";
+                if (isset($error)) echo "<div class='alert alert-danger'>$error</div>";
+             ?>
+            <form method="post" action="#" enctype="multipart/form-data">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label>Document Description</label>
+                    <input type="text" name="doc_name" class="form-control" placeholder="e.g. RIS-2026-03-30-6th-Floor" required>
                   </div>
-                  <!-- /.card-header -->
-                  <div class="card-body">
-                    <?php 
-                        if (isset($selectError)) {
-                          echo "<div class='alert alert-danger'>". $selectError."</div>";
-                        }
-                     ?>
-                    <form method="post" action="#" id="exportForm">
-                      <div class="row">
-                      <?php 
-                          foreach ($res as $table) {
-                            ?>
-                             <div class="col-md-3 col-lg-3">
-                               <label>
-                               <input type="checkbox" class="checkbox_table" name="table[]" value='<?php echo $table['Tables_in_inventory']; ?>'> 
-                               <?php echo $table['Tables_in_inventory']; ?>
-                             </label>
-                             </div>
-                            <?php 
-                          }
-                       ?>
-
-                       </div>
-        
-                       <div class="form-group">
-                         <input type="submit" class="btn btn-info" name="submit" id="submit" value="Expor database">
-                       </div>
-                    </form>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label>Select Scanned PDF</label>
+                    <input type="file" name="pdf_file" class="form-control" accept="application/pdf" required>
                   </div>
-                  <!-- /.card-body -->
                 </div>
-                  <!-- /.card-body -->
-                </div>
-          </section>
-<!-- <script src="http://code.jquery.com/jquery-3.4.1.min.js"></script>
-          <script>
-            $(document).ready(function() {
-              $('#submit').click(function(event) {
-                event.preventDefault();
-                /* Act on the event */
-                var count = 0;
-                $('.checkbox_table').each(function() {
-                  if ($(this).is(':checked')) {
-                    count = count +1;
-                  }
-                  if (count > 0) {
-                    // $('#exportForm').submit();
-                  }else{
-                    alert("Please select atleast ont table for export");
-                    return false;
-                  }
-                });
+              </div>
+              <div class="form-group border-top pt-3">
+                 <button type="submit" name="upload_pdf" class="btn btn-primary">
+                    <i class="fas fa-file-upload"></i> Archive Document
+                 </button>
+              </div>
+            </form>
+          </div>
+        </div>
 
-              });
-            });
-          </script> -->
+        <div class="card shadow">
+          <div class="card-header">
+            <h3 class="card-title"><b>Archived Inventory Records</b></h3>
+          </div>
+          <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th>Date Uploaded</th>
+                        <th>Document Name</th>
+                        <th class="text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>2026-04-08</td>
+                        <td>Supply Issuance - 17th Floor (March)</td>
+                        <td class="text-right">
+                            <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i> View</a>
+                            <a href="#" class="btn btn-sm btn-secondary"><i class="fas fa-download"></i></a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+          </div>
+        </div>
+    </div>
+  </section>
+</div>

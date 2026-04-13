@@ -23,9 +23,9 @@
               <!-- .row -->
               <div class="card">
             <div class="card-header">
-                <h3 class="card-title"><b>All expense catagory</b></h3>
+                <h3 class="card-title"><b>Issuance Purposes & Types</b></h3>
               <!--  <a href="index.php?page=add_expense_catagory" class="btn btn-primary btn-sm float-right rounded-0">Add expense catagory</a> -->
-                <button type="button" class="btn btn-primary btn-sm float-right rounded-0" data-toggle="modal" data-target=".expenseCatModal"><i class="fas fa-plus"></i> expense catagory</button>
+                <button type="button" class="btn btn-primary btn-sm float-right rounded-0" data-toggle="modal" data-target=".expenseCatModal"><i class="fas fa-plus"></i> + Add New Purpose</button>
 
               </div>
               <!-- /.card-header -->
@@ -36,7 +36,7 @@
                       <thead>
                         <tr>
                           <th>SI</th>
-                          <th>Catagory name</th>
+                          <th>Personal Request</th>
                           <th>Description</th>
                           <th>Action</th>
                         </tr>
