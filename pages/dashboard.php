@@ -687,8 +687,8 @@ $isAnalyticsEmpty = array_sum(array_map('abs', array_values($chart['sales']))) =
             <article class="card metric-card">
                 <div class="card-body">
                     <div class="metric-label">Low Stock Alerts (<?php echo htmlspecialchars($focusMonthLabel, ENT_QUOTES, 'UTF-8'); ?>)</div>
-                    <p class="metric-value">$<?php echo number_format($kpi['sales_month'], 2); ?></p>
-                    <span class="metric-note"><span class="badge-analytics badge-primary-soft">
+                    
+                    
 
                     </span></span>
                 </div>
@@ -698,8 +698,8 @@ $isAnalyticsEmpty = array_sum(array_map('abs', array_values($chart['sales']))) =
             <article class="card metric-card">
                 <div class="card-body">
                     <div class="metric-label">Stock Availability (<?php echo htmlspecialchars($focusMonthLabel, ENT_QUOTES, 'UTF-8'); ?>)</div>
-                    <p class="metric-value">$<?php echo number_format($kpi['purchase_month'], 2); ?></p>
-                    <span class="metric-note"><span class="badge-analytics badge-warning-soft"></span></span>
+                    
+                   
                 </div>
             </article>
         </div>
@@ -707,8 +707,8 @@ $isAnalyticsEmpty = array_sum(array_map('abs', array_values($chart['sales']))) =
             <article class="card metric-card">
                 <div class="card-body">
                     <div class="metric-label">INVENTORY VALUE(<?php echo htmlspecialchars($focusMonthLabel, ENT_QUOTES, 'UTF-8'); ?>)</div>
-                    <p class="metric-value">$<?php echo number_format($kpi['expense_month'], 2); ?></p>
-                    <span class="metric-note"><span class="badge-analytics badge-warning-soft">This Month</span></span>
+                    
+                    
                 </div>
             </article>
         </div>
@@ -716,11 +716,8 @@ $isAnalyticsEmpty = array_sum(array_map('abs', array_values($chart['sales']))) =
             <article class="card metric-card">
                 <div class="card-body">
                     <div class="metric-label">STOCK STATUS (<?php echo htmlspecialchars($focusMonthLabel, ENT_QUOTES, 'UTF-8'); ?>)</div>
-                    <p class="metric-value">$<?php echo number_format($kpi['profit_month'], 2); ?></p>
-                    <span class="metric-note">
-                        <span class="badge-analytics <?php echo $kpi['profit_month'] >= 0 ? 'badge-success-soft' : 'badge-warning-soft'; ?>">
-                            <?php echo $kpi['profit_month'] >= 0 ? 'Positive' : 'Negative'; ?>
-                        </span>
+                    
+                  
                     </span>
                 </div>
             </article>
@@ -729,7 +726,7 @@ $isAnalyticsEmpty = array_sum(array_map('abs', array_values($chart['sales']))) =
             <article class="card metric-card">
                 <div class="card-body">
                     <div class="metric-label">REPLENISHMENT RATE(<?php echo htmlspecialchars($focusMonthLabel, ENT_QUOTES, 'UTF-8'); ?>)</div>
-                    <p class="metric-value"><?php echo number_format($kpi['collection_rate_month'], 1); ?>%</p>
+                  
                     <span class="metric-note"></span>
                 </div>
             </article>
@@ -738,7 +735,7 @@ $isAnalyticsEmpty = array_sum(array_map('abs', array_values($chart['sales']))) =
             <article class="card metric-card">
                 <div class="card-body">
                     <div class="metric-label">Inventory Health</div>
-                    <p class="metric-value"><?php echo number_format($kpi['inventory_health'], 1); ?>%</p>
+                    
                     <span class="metric-note"></span>
                 </div>
             </article>
@@ -747,7 +744,7 @@ $isAnalyticsEmpty = array_sum(array_map('abs', array_values($chart['sales']))) =
             <article class="card metric-card">
                 <div class="card-body">
                     <div class="metric-label">TOTAL ISSUANCES</div>
-                    <p class="metric-value">$<?php echo number_format($kpi['sales_due_total'], 2); ?></p>
+                    
                     <span class="metric-note"></span>
                 </div>
             </article>
@@ -756,7 +753,7 @@ $isAnalyticsEmpty = array_sum(array_map('abs', array_values($chart['sales']))) =
             <article class="card metric-card">
                 <div class="card-body">
                     <div class="metric-label">PROCUREMENT</div>
-                    <p class="metric-value">$<?php echo number_format($kpi['purchase_due_total'], 2); ?></p>
+                    
                     <span class="metric-note"></span>
                 </div>
             </article>

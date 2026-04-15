@@ -1,86 +1,127 @@
-<!-- Content Wrapper. Contains page content  -->
 <div class="content-wrapper mt-5">
- <!-- Main content -->
-          <section class="content mt-5">
-            <div class="container-fluid">
-             
-              <!-- /.card-header -->
-               <div class="row mt-4">
-                 <div class="col-md-8 offset-md-2 col-lg-8 offset-lg-2 mt-3">
-                   <div class="card">
-                    <div class="card-header">
-                <h3 class="card-title"><b>Log New Issuance</b></h3>
-                <button type="button" class="btn btn-primary btn-sm float-right rounded-0" data-toggle="modal" data-target=".expenseCatModal" ><i class="fas fa-plus"></i> + Add Issuance Type</button>
-              </div> 
-                     <div class="card-body">
-                <form id="addExpenseForm">
-
-                  <div class="row">
-                       <div class="col-md-6 ">
+  <section class="content mt-5">
+    <div class="container-fluid">
+      <div class="row mt-4">
+        <div class="col-md-10 offset-md-1 mt-3">
+          <div class="card">
+            <div class="card-header bg-navy">
+              <h3 class="card-title"><b>Log New Requisition and Issue Slip (RIS)</b></h3>
+            </div>
+            <div class="card-body">
+              <form id="addIssuanceForm">
+                
+                <div class="row">
+                  <div class="col-md-4">
                     <div class="form-group">
-                        <label for="expense_date">Issuance Date</label>
-                    <div class="input-group flex-nowrap">
-                      <div class="input-group-prepend">
-                        <span class="input-group-text" id="addon-wrapping"><i class="fas fa-calendar-week"></i></span>
-                      </div>
-                      <input type="text" class="form-control datepicker" id="expense_date"  aria-describedby="addon-wrapping" name="expense_date">
-                    </div>
+                      <label>Issuance Date</label>
+                      <input type="text" class="form-control datepicker" name="issuance_date">
                     </div>
                   </div>
-
-                    <div class="col-md-6 ">
+                  <div class="col-md-4">
                     <div class="form-group">
-                      <label for="expense_for">Requesting Division</label>
-                      <input type="text" class="form-control" id="" name="" placeholder="">
+                      <label>Division</label>
+                      <input type="text" class="form-control" name="division" placeholder="e.g. Certification Division">
                     </div>
-                </div>
-              </div>
-
-                    <div class="row">
-                      <div class="col-md-6">
+                  </div>
+                  <div class="col-md-4">
                     <div class="form-group">
-                     
-                         <label for="expense_catagory">Item Category</label>
-                      <select name="expense_catagory" id="expense_catagory" class="form-control select2">
+                      <label>Office</label>
+                      <input type="text" class="form-control" name="office" placeholder="e.g. Philippine Railways Institute">
+                    </div>
+                  </div>
+                </div>
+
+                <hr>
+
+                <div class="row">
+                  <div class="col-md-2">
+                    <div class="form-group">
+                      <label>Stock No.</label>
+                      <input type="text" class="form-control" name="stock_no">
+                    </div>
+                  </div>
+                  <div class="col-md-2">
+                    <div class="form-group">
+                      <label>Unit</label>
+                      <input type="text" class="form-control" name="unit" placeholder="Ream/Pcs">
+                    </div>
+                  </div>
+                  <div class="col-md-5">
+                    <div class="form-group">
+                      <label>Item Description</label>
+                      <select name="item_description" class="form-control select2">
                         <?php 
-                          $all_ex_cat = $obj->all('expense_catagory');
-                          foreach ($all_ex_cat as $ex_cat) {
-                            ?>
-                              <option value="<?=$ex_cat->id?>"><?=$ex_cat->name;?></option>
-                            <?php 
+                          $items = $obj->all('office_supplies');
+                          foreach ($items as $item) {
+                            echo "<option value='{$item->id}'>{$item->item_name}</option>";
                           }
-                         ?>
+                        ?>
                       </select>
                     </div>
                   </div>
-
-                  <div class="col-md-6">
+                  <div class="col-md-3">
                     <div class="form-group">
-                      <label for="expense_amount">Quantity Issued</label>
-                      <input type="number" class="form-control" id="" name="" placeholder="">
+                      <label>Quantity Requested</label>
+                      <input type="number" class="form-control" name="qty_requested">
                     </div>
                   </div>
-
                 </div>
-                    <div class="form-group">
-                      <label for="exp_descrip">Description </label>
-                      <textarea  rows="3" class="form-control" id="exp_descrip" name="exp_descrip"></textarea>
-                    </div>
-                          <div class="form-group">
-                            <button type="submit" class="btn btn-primary btn-block mt-4 rounded-0">Add</button>
-                          </div>
-                        </form>
 
-           
-         </div>
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label>Stock Available?</label>
+                      <select name="stock_available" class="form-control">
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                      </select>
+                    </div>
                   </div>
-                 </div>
-               </div>
+                  <div class="col-md-8">
+                    <div class="form-group">
+                      <label>Purpose</label>
+                      <input type="text" class="form-control" name="purpose" placeholder="e.g. RDD Office Supplies">
+                    </div>
+                  </div>
+                </div>
+
+                <hr>
+
+                <div class="row">
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label>Requested By</label>
+                      <input type="text" class="form-control" name="requested_by">
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label>Approved By</label>
+                      <input type="text" class="form-control" name="approved_by" value="ANNA KATRINA P. FLORES">
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label>Issued By</label>
+                      <input type="text" class="form-control" name="issued_by">
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label>Received By</label>
+                      <input type="text" class="form-control" name="received_by">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group mt-4">
+                  <button type="submit" class="btn btn-success btn-block rounded-0">Save RIS Record</button>
+                </div>
+              </form>
             </div>
-            <!-- /.card-body -->
-            <!-- /.row -->
-            </div><!--/. container-fluid -->
-          </section>
-          <!-- /.content -->
+          </div>
         </div>
-        <!-- /.content-wrapper
+      </div>
+    </div>
+  </section>
+</div>

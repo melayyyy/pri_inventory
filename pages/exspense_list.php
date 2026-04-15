@@ -1,89 +1,101 @@
-<!-- Content Wrapper. Contains page content -->
-<div class="content-wrapper">
-  <!-- Content Header (Page header) -->
+<div class="content-wrapper mt-5">
   <div class="content-header">
     <div class="container-fluid">
       <div class="row mb-2">
         <div class="col-sm-6">
-          <h1 class="m-0 text-dark"><!-- Dashboard v2 --></h1>
-          </div><!-- /.col -->
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">Expense catagory</li>
-            </ol>
-            </div><!-- /.col -->
-            </div><!-- /.row -->
-            </div><!-- /.container-fluid -->
-          </div>
-          <!-- /.content-header -->
-          <!-- Main content -->
-          <section class="content">
-            <div class="container-fluid">
-
-              <div class="row">
-                   <div class="col-12 col-sm-6 col-md-4">
-                          <div class="info-box bg-success">
-                            
-                            <div class="info-box-content">
-                              <span class="info-box-text">Total Supplies Issued</span>
-                              <span class="info-box-number"> 
-                                <?php 
-  $stmt = $pdo->prepare("SELECT SUM(`amount`) FROM `expense`");
-  $stmt->execute();
-  $res = $stmt->fetch(PDO::FETCH_NUM);
-
-  // Nilagyan natin ng check: kung walang laman or error, "0" ang lalabas
-  if ($res && isset($res[0])) {
-      echo $res[0];
-  } else {
-      echo "0";
-  }
-?>
-                                </span>
-                            </div>
-                            <span class="info-box-icon"><i class="material-symbols-outlined">inventory_2</i></span>
-
-                            <!-- /.info-box-content -->
-                          </div>
-                          <!-- /.info-box -->
-                        </div>
-
-
-                        </div>
-              </div>
-              <!-- .row -->
-              <div class="card">
-               <div class="card-body">
-            <div class="card-header">
-                <h3 class="card-title"><b>Supply Issuance Logs</b></h3>
-               <a href="index.php?page=add_expense" class="btn btn-primary btn-sm float-right rounded-0">+ Log New Issuance</a>
-              </div>
-              <!-- /.card-header -->
-              <div class="card-body">
-                <div class="table-responsive">
-                  <div class="table-responsive">
-                    <table id="expenseList" class="display dataTable text-center">
-                      <thead>
-                        <tr>
-                          <th>SI</th>
-                          <th>Date Issued</th>
-                          <th>Requesting Division/Personnel</th>
-                          <th>Quantity Issued</th>
-                          <th>Item Category</th>
-                          <th>Purpose / Remarks</th>
-                          <th>Action</th>
-                        </tr>
-                      </thead>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!-- /.card-body -->
-            <!-- /.row -->
-            </div><!--/. container-fluid -->
-          </section>
-          <!-- /.content -->
+          <h1 class="m-0 text-dark">Digital Archive Dashboard</h1>
         </div>
-        <!-- /.content-wrapper -->
+      </div>
+    </div>
+  </div>
+
+  <section class="content">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-12 col-sm-6 col-md-4">
+          <div class="info-box bg-info">
+            <span class="info-box-icon"><i class="fas fa-file-archive"></i></span>
+            <div class="info-box-content">
+              <span class="info-box-text">Total Archived Slips</span>
+              <span class="info-box-number">
+                <?php 
+                  $stmt = $conn->query("SELECT COUNT(*) FROM `archives` ");
+                  $res = $stmt->fetch_row();
+                  echo ($res[0]) ? $res[0] : "0";
+                ?>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-md-4">
+          <div class="info-box bg-success">
+            <span class="info-box-icon"><i class="fas fa-boxes"></i></span>
+            <div class="info-box-content">
+              <span class="info-box-text">Total Units Issued</span>
+              <span class="info-box-number">
+                <?php 
+                  // Ina-assume natin na ang 'amount' column ang nag-tatrack ng quantity
+                  $stmt = $conn->query("SELECT SUM(id) FROM `archives` "); 
+                  $res = $stmt->fetch_row();
+                  echo ($res[0]) ? $res[0] : "0";
+                ?>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card card-outline card-navy">
+        <div class="card-header">
+          <h3 class="card-title"><b>Master List of Scanned RIS</b></h3>
+          <a href="index.php?page=add_archive" class="btn btn-primary btn-sm float-right rounded-0">
+            <i class="fas fa-plus"></i> New Digital Backup
+          </a>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table id="risLogs" class="table table-bordered table-striped text-center">
+              <thead>
+                <tr class="bg-light">
+                  <th>Date Encoded</th>
+                  <th>Stock No.</th>
+                  <th>Item Description</th>
+                  <th>Division / Office</th>
+                  <th>Signatories</th>
+                  <th>File Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php
+                  // Kumukuha tayo ng data mula sa 'archives' table na pinagawa mo kanina
+                  $all_archives = $conn->query("SELECT * FROM archives ORDER BY date_archived DESC");
+                  while($row = $all_archives->fetch_assoc()):
+                ?>
+                <tr>
+                  <td><?= date('M d, Y', strtotime($row['date_archived'])) ?></td>
+                  <td><span class="badge badge-secondary"><?= $row['stock_no'] ?></span></td>
+                  <td><?= $row['doc_name'] ?></td>
+                  <td>
+                    <strong><?= $row['division'] ?></strong><br>
+                    <small class="text-muted"><?= $row['office'] ?></small>
+                  </td>
+                  <td>
+                    <small>Req: <?= $row['requested_by'] ?></small><br>
+                    <small>App: <b><?= $row['approved_by'] ?></b></small>
+                  </td>
+                  <td>
+                    <a href="<?= $row['file_path'] ?>" target="_blank" class="btn btn-sm btn-info">
+                      <i class="fas fa-eye"></i> View Scan
+                    </a>
+                  </td>
+                </tr>
+                <?php endwhile; ?>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

@@ -5,7 +5,7 @@
       <div class="row mb-2 align-items-center">
         <div class="col-sm-7">
           <h1 class="m-0 text-dark">Category Management</h1>
-          <small class="text-muted">Organize inventory categories with a cleaner workflow.</small>
+          <small class="text-muted"></small>
         </div>
         <div class="col-sm-5">
           <ol class="breadcrumb float-sm-right mb-0">
@@ -209,7 +209,7 @@
       <div class="card cat-card">
         <div class="card-header d-flex justify-content-between align-items-center" style="gap:8px;">
           <h3 class="card-title">Category Table</h3>
-          <small class="text-muted">Server-side paginated</small>
+          <small class="text-muted"></small>
         </div>
         <div class="card-body">
           <div class="cat-table-wrap" id="categoryTableWrap">
@@ -227,8 +227,8 @@
                 <thead>
                   <tr>
                     <th>SI</th>
-                    <th>Category Name</th>
                     <th>Description</th>
+                    <th>Date Issued</th>
                     <th>Action</th>
                   </tr>
                 </thead>
