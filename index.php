@@ -1,37 +1,32 @@
 <?php
-  error_reporting(0); // Ito ang magtatanggal ng lahat ng "sulat-sulat" sa taas
+  error_reporting(0);
   include_once 'connectdb.php';
 ?>
 
 <?php require_once 'inc/header.php'; ?>
 <?php require_once 'inc/sidebar.php'; ?>
 
-  <!-- Content Wrapper. Contains page content -->
-
-  <?php
-        $requestedPage = $_GET['page'] ?? 'dashboard';
-        $requestedPage = is_string($requestedPage) ? trim($requestedPage) : 'dashboard';
-
-        $allowedPages = array_map(
-          static function ($file) {
+<?php
+    // Kunin ang requested page, default ay dashboard
+    $requestedPage = $_GET['page'] ?? 'dashboard';
+    
+    // Automatic na tinitingnan nito lahat ng PHP files sa loob ng "pages" folder
+    $allowedPages = array_map(
+        static function ($file) {
             return basename($file, '.php');
-          },
-          glob(__DIR__ . '/pages/*.php') ?: []
-        );
+        },
+        glob(__DIR__ . '/pages/*.php') ?: []
+    );
 
-        $isValidPageKey = preg_match('/^[a-zA-Z0-9_]+$/', $requestedPage) === 1;
-        $pagePath = __DIR__ . '/pages/' . $requestedPage . '.php';
+    $pagePath = __DIR__ . '/pages/' . $requestedPage . '.php';
 
-        if ($isValidPageKey && in_array($requestedPage, $allowedPages, true) && is_file($pagePath)) {
-          require_once $pagePath;
-        } else {
-          require_once __DIR__ . '/pages/error_page.php';
-        }
- ?>
-  <!-- Control Sidebar -->
-  <aside class="control-sidebar control-sidebar-dark">
-    <!-- Control sidebar content goes here -->
-  </aside>
-  <!-- /.control-sidebar -->
+    // Check kung valid ang page at existing sa folder na "pages"
+    if (in_array($requestedPage, $allowedPages, true) && is_file($pagePath)) {
+        require_once $pagePath;
+    } else {
+        // Kung wala ang file sa pages folder, dito siya babagsak
+        require_once __DIR__ . '/pages/dashboard.php'; 
+    }
+?>
 
- <?php require_once 'inc/footer.php'; ?>
+<?php require_once 'inc/footer.php'; ?>

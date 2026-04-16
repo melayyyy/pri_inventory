@@ -35,7 +35,7 @@ if ($avatarInitial === '') {
                 <li class="nav-item">
                     <a href="index.php?page=category" title="Categories" class="nav-link <?php echo $actual_link == 'category' ? 'active' : ''; ?>" <?php echo $actual_link == 'category' ? 'aria-current="page"' : ''; ?>>
                         <i class="nav-icon fas fa-th"></i>
-                        <p>Categories</p>
+                        <p>Description</p>
                     </a>
                 </li>
 
@@ -44,7 +44,7 @@ if ($avatarInitial === '') {
                     <a href="#" title="Expenses" class="nav-link <?php echo in_array($actual_link, ['add_expense', 'exspense_list', 'expense_catagory_list']) ? 'active' : ''; ?>">
                         <i class="nav-icon fas fa-money-bill-wave"></i>
                         <p>
-                           Supply Issuances
+                           Requisition and Issue Slip
                             <i class="right fas fa-angle-left"></i>
                         </p>
                     </a>
@@ -52,50 +52,33 @@ if ($avatarInitial === '') {
                         <li class="nav-item">
                             <a href="index.php?page=add_expense" class="nav-link <?php echo $actual_link == 'add_expense' ? 'active' : ''; ?>">
                                 <i class="far fa-circle nav-icon"></i>
-                                <p>New Issuance</p>
+                                <p>New Requisition</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="index.php?page=exspense_list" class="nav-link <?php echo $actual_link == 'exspense_list' ? 'active' : ''; ?>">
                                 <i class="far fa-circle nav-icon"></i>
-                                <p>Issuance History</p>
+                                <p>Updated Issue Slip</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="index.php?page=expense_catagory_list" class="nav-link <?php echo $actual_link == 'expense_catagory_list' ? 'active' : ''; ?>">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Purpose / Type</p>
-                            </a>
+                           
                         </li>
                     </ul>
                 </li>
 
                 <li class="nav-item has-treeview <?php echo in_array($actual_link, ['buy_product', 'buy_list', 'buy_refund_list']) ? 'menu-open' : ''; ?>">
-                    <a href="#" title="Purchases" class="nav-link <?php echo in_array($actual_link, ['buy_product', 'buy_list', 'buy_refund_list']) ? 'active' : ''; ?>">
-                        <i class="nav-icon fas fa-truck"></i>
-                        <p>
-                           Supply Procurement
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
+                   
+                        
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="index.php?page=buy_product" class="nav-link <?php echo $actual_link == 'buy_product' ? 'active' : ''; ?>">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>New Delivery</p>
-                            </a>
+                            
                         </li>
                         <li class="nav-item">
-                            <a href="index.php?page=buy_list" class="nav-link <?php echo $actual_link == 'buy_list' ? 'active' : ''; ?>">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Delivery History</p>
-                            </a>
-                        </li>
+                           
                         <li class="nav-item">
-                            <a href="index.php?page=buy_refund_list" class="nav-link <?php echo $actual_link == 'buy_refund_list' ? 'active' : ''; ?>">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Return to Supplier</p>
-                            </a>
+                            
                         </li>
                     </ul>
                 </li>
@@ -124,97 +107,6 @@ if ($avatarInitial === '') {
                     </ul>
                 </li>
 
-                <li class="nav-header sidebar-section-label" role="presentation">COMMUNICATION</li>
-                <li class="nav-item has-treeview <?php echo in_array($actual_link, ['member', 'suppliar', 'customers_report', 'suppliar_report', 'sms']) ? 'menu-open' : ''; ?>">
-                    <a href="#" title="Contacts" class="nav-link <?php echo in_array($actual_link, ['member', 'suppliar', 'customers_report', 'suppliar_report', 'sms']) ? 'active' : ''; ?>">
-                        <i class="nav-icon fas fa-address-book"></i>
-                        <p>
-                            Contacts
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="index.php?page=member" class="nav-link <?php echo $actual_link == 'member' ? 'active' : ''; ?>">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Office Directory</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="index.php?page=suppliar" class="nav-link <?php echo $actual_link == 'suppliar' ? 'active' : ''; ?>">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Supplier Registry</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="index.php?page=customers_report" class="nav-link <?php echo $actual_link == 'customers_report' ? 'active' : ''; ?>">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Division Requests</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="index.php?page=suppliar_report" class="nav-link <?php echo $actual_link == 'suppliar_report' ? 'active' : ''; ?>">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Procurement Status</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="index.php?page=sms" class="nav-link <?php echo $actual_link == 'sms' ? 'active' : ''; ?>">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Notifications</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-
-                <li class="nav-header sidebar-section-label" role="presentation">INSIGHTS</li>
-                <li class="nav-item has-treeview <?php echo in_array($actual_link, ['profit_loss', 'sales_report', 'purchase_report', 'purchase_pay_report', 'sell_pay_report', 'total_report']) ? 'menu-open' : ''; ?>">
-                    <a href="#" title="Reports" class="nav-link <?php echo in_array($actual_link, ['profit_loss', 'sales_report', 'purchase_report', 'purchase_pay_report', 'sell_pay_report', 'total_report']) ? 'active' : ''; ?>">
-                        <i class="nav-icon fas fa-chart-line"></i>
-                        <p>
-                            Reports
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="index.php?page=profit_loss" class="nav-link <?php echo $actual_link == 'profit_loss' ? 'active' : ''; ?>">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Inventory Valuation</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="index.php?page=sales_report" class="nav-link <?php echo $actual_link == 'sales_report' ? 'active' : ''; ?>">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Issuance Report</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="index.php?page=purchase_report" class="nav-link <?php echo $actual_link == 'purchase_report' ? 'active' : ''; ?>">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Procurement Report</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="index.php?page=sell_pay_report" class="nav-link <?php echo $actual_link == 'sell_pay_report' ? 'active' : ''; ?>">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Stock In/Out Log</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="index.php?page=purchase_pay_report" class="nav-link <?php echo $actual_link == 'purchase_pay_report' ? 'active' : ''; ?>">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Division Summary</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="index.php?page=total_report" class="nav-link <?php echo $actual_link == 'total_report' ? 'active' : ''; ?>">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Inventory Summary</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
                 
                 <li class="nav-header sidebar-section-label" role="presentation">SYSTEM</li>
                 <li class="nav-item">
