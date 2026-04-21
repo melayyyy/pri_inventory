@@ -18,6 +18,8 @@
         glob(__DIR__ . '/pages/*.php') ?: []
     );
 
+    
+
     $pagePath = __DIR__ . '/pages/' . $requestedPage . '.php';
 
     // Check kung valid ang page at existing sa folder na "pages"
