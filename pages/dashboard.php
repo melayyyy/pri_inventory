@@ -671,12 +671,12 @@ $isAnalyticsEmpty = array_sum(array_map('abs', array_values($chart['sales']))) =
                     <div style="background: rgba(41, 128, 185, 0.1); border: 1px solid rgba(41, 128, 185, 0.3); padding: 25px; border-radius: 15px; height: 160px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center;">
                         <div style="position: relative; z-index: 2;">
                             <h2 style="font-weight: 700; color: #2980b9; margin: 0; font-size: 1.5rem;">Office Supplies</h2>
-                            <p style="color: #666; font-size: 0.85rem; margin-top: 5px;">DOTr Central Office | Monitoring Portal</p>
+                            <p style="color: #666; font-size: 0.85rem; margin-top: 5px;">PRI | Monitoring Portal</p>
                             
                             <div style="margin-top: 15px;">
                                 <a href="index.php?page=category" style="text-decoration: none;">
                                     <span style="background: #2980b9; color: white; padding: 7px 18px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; display: inline-block; transition: 0.3s;">
-                                        View Categories
+                                        View 
                                     </span>
                                 </a>
                             </div>
@@ -690,12 +690,12 @@ $isAnalyticsEmpty = array_sum(array_map('abs', array_values($chart['sales']))) =
         
         <div style="position: relative; z-index: 2;">
             <h2 style="font-weight: 700; color: #c0392b; margin: 0; font-size: 1.5rem;">Machinery & Equipment</h2>
-            <p style="color: #666; font-size: 0.85rem; margin-top: 5px;">DOTr Central Office | Monitoring Portal</p>
+            <p style="color: #666; font-size: 0.85rem; margin-top: 5px;">PRI | Monitoring Portal</p>
             
             <div style="margin-top: 15px;">
                 <a href="index.php?page=suppliar" style="text-decoration: none;">
                     <span style="background: #c0392b; color: white; padding: 7px 18px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; display: inline-block; transition: 0.3s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
-                        View Categories
+                        View 
                     </span>
                 </a>
             </div>
@@ -710,12 +710,12 @@ $isAnalyticsEmpty = array_sum(array_map('abs', array_values($chart['sales']))) =
         
         <div style="position: relative; z-index: 2;">
             <h2 style="font-weight: 700; color: #c0392b; margin: 0; font-size: 1.5rem;">Furnitures and Fixtures</h2>
-            <p style="color: #666; font-size: 0.85rem; margin-top: 5px;">DOTr Central Office | Monitoring Portal</p>
+            <p style="color: #666; font-size: 0.85rem; margin-top: 5px;">PRI| Monitoring Portal</p>
             
             <div style="margin-top: 15px;">
                 <a href="index.php?page=customers_report" style="text-decoration: none;">
                     <span style="background: #c0392b; color: white; padding: 7px 18px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; display: inline-block; transition: 0.3s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
-                        View Categories
+                        View 
                     </span>
                 </a>
             </div>
@@ -729,12 +729,12 @@ $isAnalyticsEmpty = array_sum(array_map('abs', array_values($chart['sales']))) =
         
         <div style="position: relative; z-index: 2;">
             <h2 style="font-weight: 700; color: #c0392b; margin: 0; font-size: 1.5rem;">Transportation Equipment</h2>
-            <p style="color: #666; font-size: 0.85rem; margin-top: 5px;">DOTr Central Office | Monitoring Portal</p>
+            <p style="color: #666; font-size: 0.85rem; margin-top: 5px;">PRI | Monitoring Portal</p>
             
             <div style="margin-top: 15px;">
                 <a href="index.php?page=suppliar_report" style="text-decoration: none;">
                     <span style="background: #c0392b; color: white; padding: 7px 18px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; display: inline-block; transition: 0.3s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
-                        View Categories
+                        View 
                     </span>
                 </a>
             </div>
@@ -748,12 +748,12 @@ $isAnalyticsEmpty = array_sum(array_map('abs', array_values($chart['sales']))) =
                     <div style="background: rgba(41, 128, 185, 0.1); border: 1px solid rgba(41, 128, 185, 0.3); padding: 25px; border-radius: 15px; height: 160px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center;">
                         <div style="position: relative; z-index: 2;">
                             <h2 style="font-weight: 700; color: #2980b9; margin: 0; font-size: 1.5rem;">Building and Structures</h2>
-                            <p style="color: #666; font-size: 0.85rem; margin-top: 5px;">DOTr Central Office | Monitoring Portal</p>
+                            <p style="color: #666; font-size: 0.85rem; margin-top: 5px;">PRI| Monitoring Portal</p>
                             
                             <div style="margin-top: 15px;">
                                 <a href="index.php?page=sms" style="text-decoration: none;">
                                     <span style="background: #2980b9; color: white; padding: 7px 18px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; display: inline-block; transition: 0.3s;">
-                                        View Categories
+                                        View 
                                     </span>
                                 </a>
                             </div>

@@ -1,16 +1,9 @@
 <div class="content-wrapper">
   <div class="content-header">
-    <div class="container-fluid mt-4">
-      <div class="row">
-        <div class="col-md-6">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
           <h1 class="m-0 text-dark">Machinery & Equipment</h1>
-          <p class="text-muted"></p>
-        </div>
-        <div class="col-md-6">
-          <ol class="breadcrumb float-sm-right">
-            <li class="breadcrumb-item"><a href="index.php?page=dashboard">Home</a></li>
-            <li class="breadcrumb-item active">Machinery</li>
-          </ol>
         </div>
       </div>
     </div>
@@ -18,101 +11,67 @@
 
   <section class="content">
     <div class="container-fluid">
-      
-      <div class="card card-outline card-danger shadow-sm">
-        <div class="card-body">
-          <div class="row">
-            <div class="col-12 col-sm-6 col-md-4">
-              <div class="info-box bg-danger mb-3">
-                <div class="info-box-content">
-                  <span class="info-box-text">Total Initial Units</span>
-                  <span class="info-box-number"> 
-                    <?php 
-                      // Binago natin ang query para mag-count ng units sa machinery table
-                      $stmt = $pdo->prepare("SELECT SUM(`initial_qty`) FROM `machinery` ");
-                      $stmt->execute();
-                      $res = $stmt->fetch(PDO::FETCH_NUM);
-                      echo $res[0] ?? '0';
-                    ?>
-                  </span>
-                </div>
-                <span class="info-box-icon"><i class="fas fa-boxes"></i></span>
-              </div>
-            </div>
-
-            <div class="col-12 col-sm-6 col-md-4">
-              <div class="info-box bg-success mb-3">
-                <div class="info-box-content">
-                  <span class="info-box-text">Total Issued</span>
-                  <span class="info-box-number"> 
-                    <?php 
-                      $stmt = $pdo->prepare("SELECT SUM(`issued_qty`) FROM `machinery` ");
-                      $stmt->execute();
-                      $res = $stmt->fetch(PDO::FETCH_NUM);
-                      echo $res[0] ?? '0';
-                    ?>
-                  </span>
-                </div>
-                <span class="info-box-icon"><i class="fas fa-hand-holding"></i></span>
-              </div>
-            </div>
-
-            <div class="col-12 col-sm-6 col-md-4">
-              <div class="info-box bg-info mb-3">
-                <div class="info-box-content">
-                  <span class="info-box-text">Operational Health</span>
-                  <span class="info-box-number"> 
-                    <?php 
-                      // Average health status ng mga makinarya
-                      $stmt = $pdo->prepare("SELECT AVG(`health_percent`) FROM `machinery` ");
-                      $stmt->execute();
-                      $res = $stmt->fetch(PDO::FETCH_NUM);
-                      echo round($res[0] ?? 0) . "%";
-                    ?>
-                  </span>
-                </div>
-                <span class="info-box-icon"><i class="fas fa-heartbeat"></i></span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div class="card card-outline card-danger shadow">
-        <div class="card-header border-0">
-          <h3 class="card-title"><b>Machinery & Equipment Inventory</b></h3>
-          <button type="button" class="btn btn-danger btn-sm float-right rounded-pill" data-toggle="modal" data-target=".machineryModal">
-            <i class="fas fa-plus mr-1"></i> Add New Equipment
+        <div class="card-header">
+          <h3 class="card-title"><b>Asset Reconciliation & Monitoring</b></h3>
+          <button type="button" class="btn btn-primary btn-sm float-right rounded-0" data-toggle="modal" data-target="#addMachineryModal">
+            <i class="fas fa-plus"></i> Add Equipment
           </button>
         </div>
         
         <div class="card-body">
           <div class="table-responsive">
-            <table id="machineryTable" class="table table-hover text-center align-middle">
-              <thead class="bg-light">
-                <tr>
-                  <th>Property No.</th>
-                  <th>Item / Description</th>
-                  <th>Sub-Category</th> <th>Initial Stock</th> <th>Issued To</th> <th>Inventory Health</th> <th>Monthly Recon</th> <th>Action</th>
+            <table id="machineryTable" class="table table-bordered table-striped text-center">
+              <thead>
+                <tr class="bg-light">
+                  <th>List of Inventory</th> <th>Sub-Category</th> <th>Initial Inventory</th> <th>No. of Issued</th> <th>Inventory Balance</th> <th>Division Concerned</th> <th>Health (%)</th> <th>Action</th>
                 </tr>
               </thead>
               <tbody>
-                </tbody>
+                <tr>
+                  <td class="text-left">Desktop Computer (Admin)</td>
+                  <td><span class="badge badge-info">ICT</span></td>
+                  <td>15 units</td>
+                  <td>10</td>
+                  <td>5</td>
+                  <td>AFS</td>
+                  <td>90%</td>
+                  <td>
+                    <button class="btn btn-xs btn-info"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-xs btn-danger"><i class="fas fa-trash"></i></button>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="text-left">Two-Way Radio</td>
+                  <td><span class="badge badge-warning">COMMUNICATION</span></td>
+                  <td>20 units</td>
+                  <td>15</td>
+                  <td>5</td>
+                  <td>CATS</td>
+                  <td>85%</td>
+                  <td>
+                    <button class="btn btn-xs btn-info"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-xs btn-danger"><i class="fas fa-trash"></i></button>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="text-left">Railway Signaling Unit</td>
+                  <td><span class="badge badge-success">RAILWAY</span></td>
+                  <td>5 units</td>
+                  <td>2</td>
+                  <td>3</td>
+                  <td>RDD</td>
+                  <td>100%</td>
+                  <td>
+                    <button class="btn btn-xs btn-info"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-xs btn-danger"><i class="fas fa-trash"></i></button>
+                  </td>
+                </tr>
+              </tbody>
             </table>
           </div>
         </div>
       </div>
-
     </div>
   </section>
 </div>
-
-<script>
-$(document).ready(function() {
-    $('#machineryTable').DataTable({
-        "responsive": true,
-        "autoWidth": false,
-        "order": [[0, "desc"]]
-    });
-});
-</script>
